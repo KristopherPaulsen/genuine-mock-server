@@ -4,8 +4,8 @@ const express = require('express');
 const { isEqual, flow, difference, keys } = require('lodash');
 
 const queryString = /(?:\?)(.*)(?!:\/)/;
-const toBasePath = url => url.replace(/(\/[a-zA-Z0-9-_]*)(\?.*)/, '$1');
-const paramsToRegex = url => url.replace(/((?::|#)[a-zA-Z0-9-_]*)/g, '[a-zA-Z0-9-_]*');
+const toBasePath = url => url.replace(/(\/[\w-]*)(\?.*)/, '$1');
+const paramsToRegex = url => url.replace(/((?::|#)[\w-]*)/g, '[\\w-]*');
 
 const parseQueryString = (query) => {
   if (!query.match(queryString)) {
