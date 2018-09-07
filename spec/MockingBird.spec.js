@@ -9,7 +9,7 @@ const {
   toQueryPathMap,
   getPartitionedMocks,
   toFinalQueryPathMap,
-} = require('../MockingBird.js');
+} = require('../mockServer/MockingBird.js');
 
 const {
   mocks,
