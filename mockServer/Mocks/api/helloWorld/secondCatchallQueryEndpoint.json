@@ -1,0 +1,10 @@
+{
+  "path": "/api/helloworld/catchall/queryendpoint?name=:whatever&other=foobar",
+  "methods": {
+    "get": {
+      "response": {
+        "key": "This is the second catch all queryEndpoint?name=whatever&other=foobar"
+      }
+    }
+  }
+}
