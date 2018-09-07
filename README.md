@@ -1,148 +1,289 @@
-#----------------------------------------------------------------------------------
-# Mock Server: Overview
-#----------------------------------------------------------------------------------
-
-MockingBird.js introduces mocking of api endpoints (internal AND external), while
-allowing developers to use Axios, or command line tools to interact with the mock
-server. All requests using axios are re-routed through the server (when start:mock is ran), allowing for
-mocking to be abstracted away.
-
-Features:
-  1) Mock external endpoints
-  2) Mock Internal endpoints
-  3) Query String endpoints can be mocked
-  4) "WaitTime" can be introduced into responses
-  5) Error codes can be included (Need a 404? Worry no more!)
-  6) The mock server can be accessed on the command line
-  7) Unit Tests no longer require the entire mocking of endpoints, just individual ones.
-  8) The old user-api mocking, and this new mock, use separate instances of Axios,
-    so no backwards changes need to be made. Both run in parallel.
-  9) Endpoints are consumed and built programatically, so minimal developer interaction
-     is needed
- 10) The same mock files can be used by unit tests, and the mock Server. Write once,
-     use Ad Infinium
-
-#----------------------------------------------------------------------------------
 # Getting Started
-#----------------------------------------------------------------------------------
 
-1) npm run start:mock
+1. Create a simple mock files directory
 
-2) curl http://localhost:8080/api/helloworld/example
+    `mkdir mocks`
 
-3) For examples of each type of endpoint, look inside:
 
-   mockServer/Mocks/api/helloWorld
+2. Create a simple mock file inside `mocks/`
 
-#----------------------------------------------------------------------------------
-# Creating a standard mock endpoint
-#----------------------------------------------------------------------------------
+   `vim mocks/example.json`
 
-1) Create a file inside mockServer/Mocks/
+   *Note folder structure, file names, etc DO NOT MATTER.
+   A file named Foobar could map to any endpoint. Naming conventions
+   are entirely up to you!*
 
-2) file names must end in .json.
+```javascript
+{
+  "path": "/example",
+  "methods": {
+    "get": {
+      "response": {
+        "key": "This is the get response!"
+      }
+    }
+  }
+}
 
-3) Folder name-scheme should roughly follow the api path
-   (for developer convenience, the server DOES NOT really on folder names, it's just a convention)
+```
 
-4) Each endpoint gets one mock file (but a mockfile can define multiple http methods per endpoint)
+3. Create a script to start your mock server
 
-#----
-# Ex)
-#----
+    `vim server.js`
 
-  file: mockSever/Mocks/api/domains.json
+```javascript
 
+const { init } = require('genuine-mock-server');
+
+init({
+  port: 8080,
+  pathToFiles: './mock',
+  filePattern: '*.json',
+});
+
+```
+
+
+Use your prefered script watcher (We recommend nodemon)
+
+4. `nodemon server.js` or `node server.js`
+
+5. `curl http:/localhost:8080/example`
+
+
+# Overview of Mock files
+
+
+Each endpiont should get one respective mock file. This file
+describes the various http methods that can be used, and their respective responses
+
+###### Path
+The endpoint URL. Can include multiple paramaters, querystrings, or any combination!
+
+(See examples below)
+
+###### methods
+An object of keys (each an `http` method), describing the various responses
+
+###### statusCode
+The status code of the returned http response. All status codes are supported!
+
+###### waitTime
+The wait time (milliseconds) before the server responds. Useful for including artificial delays
+
+###### response
+Everything inside this key will be the response given by the server in `json` format.
+
+#### Path paramater endpoint
+
+```javascript
   {
-    "path": "/api/users/:userId/domains",
+    "path": "/example/param/:param/second/#second",
     "methods": {
       "get": {
+        "statusCode": 200,
+        "waitTime": 0,
         "response": {
           "key": "This is the get response!"
         }
       },
-      // put here
-      // delete here
-      // etc
-    }
-  }
-
-  curl http://localhost:8080/api/users/:userId/domains
-
-#----------------------------------------------------------------------------------
-# Creating a mock endpoint for querstring urls
-#----------------------------------------------------------------------------------
-
-Creating an endpoint for urls which should be mocked with querystrings
-is almost exactly the same
-
-1) Create a file inside mockServer/Mocks/
-
-2) file names must end in .json.
-
-3) Folder name-scheme should roughly follow the api path
-   (for developer convenience, the server DOES NOT really on folder names)
-
-#----
-# Ex)
-#----
-
-    file: mockSever/Mocks/api/domains.json
-
-    {
-      "path": "/api/users/:userId/domains?name=foobar",  <----- include querystring in path
-      "methods": {
-        "get": {
-          "response": {
-            "key": "This is the get response!"
-          }
-        },
+      "delete": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the delete response!"
+        }
       }
     }
+  }
+```
 
-    curl http://localhost:8080/api/users/123/domains?name=foobar
+  `curl http://localhost:8080/example/param/123/second/1234`
 
-#----------------------------------------------------------------------------------
-# Features of the mock files
-#----------------------------------------------------------------------------------
 
-Mock files provide various convience keys, to allow for easier development
+#### query string endpoint
 
-#----
-# Ex)
-#----
-
+```javascript
   {
-    "path": "/api/helloworld/param/:param/second/#second", <---- Multiple path paramaters are permitted (:param or #param)
+    "path": "/querystring?name=foo",
     "methods": {
-      "get": {               <------- get, post, put, patch, delete, head are supported
-        "statusCode": 200,   <------- all status codes are supported
-        "waitTime": 500,     <------- waitime (ms) can be included to artificially increase response time
+      "get": {
+        "statusCode": 200,
+        "waitTime": 0,
         "response": {
           "key": "This is the get response!"
         }
       },
-    }
-  }
-
-  curl http://localhost:8080/api/helloworld/param/:param/second/#second
-
-
-#----
-# Ex)
-#----
-
-  path parameters can also be mixed with query string endpoints
-
-  {
-    "path": "/api/helloworld/param/:param/queryendpoint?name=100",
-      "methods": {
-        "get": {
-          "response": {
-            "key": "This is the get querystring / path param response"
-          }
+      "delete": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the delete response!"
         }
       }
+    }
   }
+```
 
-  curl http://localhost:8080/api/helloworld/param/:param/queryendpoint?name=100
+  `curl http://localhost:8080/querystring?name=foo`
+
+#### query string and path parameter endpoint
+```javascript
+{
+    "path": "/pathparam/:param/querystring?name=foo",
+    "methods": {
+      "get": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the get response!"
+        }
+      },
+      "delete": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the delete response!"
+        }
+      }
+    }
+  }
+}
+```
+
+`curl http://localhost:8080/pathparam/123/queryString?name=foo`
+
+
+#### query string with parameters
+
+*This framework allows for parameters in the querystring itself,
+so you can catch any value for a given key*
+
+###### querysring placeholders
+`:foo` is a placeholder, but you can use `:anyWordHere`
+
+
+```javascript
+{
+    "path": "/pathparam/:param/querystring?name=:foo&age=28",
+    "methods": {
+      "get": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the get response!"
+        }
+      },
+      "delete": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the delete response!"
+        }
+      }
+    }
+  }
+}
+```
+
+`curl http://localhost:8080/pathparam/123/querystring?name=whatever&age=28`
+
+
+##### IMPORTANT !!!!
+If you use a `somekey=:param` in your query string, avoid creating endpoints that also
+explicitly define a value for that `somekey=valueHere`, otherwise the server will incorrectly respond
+with whichever endpoint happens to come up first.
+
+
+*Will have a conflict*
+``` javascript
+{
+    "path": "/pathparam/:param/querystring?name=:foo&age=28",
+    "methods": {
+      "get": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the get response!"
+        }
+      },
+      "delete": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the delete response!"
+        }
+      }
+    }
+  }
+}
+
+// some other file somewhere, nows theres a conflict
+{
+    "path": "/pathparam/:param/querystring?somekey=valueHere&age=28",
+    "methods": {
+      "get": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the get response!"
+        }
+      },
+      "delete": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the delete response!"
+        }
+      }
+    }
+  }
+}
+
+```
+
+*No conflicts, different set of key-values*
+```javascript
+{
+    "path": "/pathparam/:param/querystring?somekey=:foo&age=28",
+    "methods": {
+      "get": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the get response!"
+        }
+      },
+      "delete": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the delete response!"
+        }
+      }
+    }
+  }
+}
+
+// some other file somewhere, but no conflicts due to separate key-value lists
+{
+    "path": "/pathparam/:param/querystring?somekey=valueHere&age=28&anotherKey=value",
+    "methods": {
+      "get": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the get response!"
+        }
+      },
+      "delete": {
+        "statusCode": 200,
+        "waitTime": 0,
+        "response": {
+          "key": "This is the delete response!"
+        }
+      }
+    }
+  }
+}
+```
