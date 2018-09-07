@@ -1,0 +1,10 @@
+{
+  "path": "/api/helloworld/param/:param/second/:second",
+  "methods": {
+    "get": {
+      "response": {
+        "key": "This is the get response for a path with paramaters!"
+      }
+    }
+  }
+}

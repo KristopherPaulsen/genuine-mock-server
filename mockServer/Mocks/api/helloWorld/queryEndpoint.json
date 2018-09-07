@@ -1,0 +1,10 @@
+{
+  "path": "/api/helloworld/queryendpoint?name=100",
+  "methods": {
+    "get": {
+      "response": {
+        "key": "This is the get querystring response"
+      }
+    }
+  }
+}

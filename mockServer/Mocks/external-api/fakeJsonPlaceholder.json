@@ -1,0 +1,11 @@
+{
+  "path": "/external-api/jsonplaceholder.typicode.com/posts/5",
+  "methods": {
+    "get": {
+      "statusCode": 200,
+      "response": {
+          "external": " I am the mocked external api data!"
+      }
+    }
+  }
+}
