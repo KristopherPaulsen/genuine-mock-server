@@ -37,7 +37,7 @@ const { init } = require('genuine-mock-server');
 
 init({
   port: 8080,
-  pathToFiles: './mock',
+  pathToFiles: './mocks',
   filePattern: '*.json',
 });
 
@@ -48,7 +48,7 @@ Use your prefered script watcher (We recommend nodemon)
 
 4. `nodemon server.js` or `node server.js`
 
-5. `curl http:/localhost:8080/example`
+5. `curl http://localhost:8080/example`
 
 
 # Overview of Mock files
@@ -57,21 +57,21 @@ Use your prefered script watcher (We recommend nodemon)
 Each endpiont should get one respective mock file. This file
 describes the various http methods that can be used, and their respective responses
 
-###### Path
+##### Path
 The endpoint URL. Can include multiple paramaters, querystrings, or any combination!
 
 (See examples below)
 
-###### methods
+##### methods
 An object of keys (each an `http` method), describing the various responses
 
-###### statusCode
+##### statusCode
 The status code of the returned http response. All status codes are supported!
 
-###### waitTime
+##### waitTime
 The wait time (milliseconds) before the server responds. Useful for including artificial delays
 
-###### response
+##### response
 Everything inside this key will be the response given by the server in `json` format.
 
 #### Path paramater endpoint
@@ -267,7 +267,7 @@ with whichever endpoint happens to come up first.
 
 // some other file somewhere, but no conflicts due to separate key-value lists
 {
-    "path": "/pathparam/:param/querystring?somekey=valueHere&age=28&anotherKey=value",
+    "path": "/pathparam/:param/querystring?somekey=:foo&age=28&anotherKey=value",
     "methods": {
       "get": {
         "statusCode": 200,
