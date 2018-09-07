@@ -1,5 +1,6 @@
 const glob = require('glob');
 const path = require('path');
+const express = require('express');
 const { isEqual, flow, difference, keys } = require('lodash');
 
 const queryString = /(?:\?)(.*)(?!:\/)/;
@@ -28,10 +29,12 @@ const areEquivalent = (serverQuery, queryMock) => {
   ));
 };
 
-const rawMocks = glob
-  .sync(path.resolve(path.resolve('mockServer/Mocks/**/**/*.json')))
+const getMocks = ({ pathToFiles, filePattern}) => (
+  glob
+  .sync(path.resolve(path.resolve(`${pathToFiles}/**/${filePattern}`)))
   // eslint-disable-next-line
-  .map(file => require(path.resolve(file)));
+  .map(file => require(path.resolve(file)))
+);
 
 const toQueryMocks = mock => (
   Object.keys(mock.methods).reduce((queryMocks, method) => {
@@ -121,13 +124,38 @@ const getPartitionedMocks = flow(
   ])
 );
 
+const init = ({ port, filePattern, pathToFiles }) => {
+  const mockServer = express();
+
+  const rawMocks = getMocks({ filePattern, pathToFiles })
+
+  mockServer.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+  });
+
+  flow(
+    getPartitionedMocks,
+    ([nonQueryMocks, finalQueryPathMap]) => {
+      routesForNonQueryMocks(mockServer, nonQueryMocks);
+      routesForQueryMocks(mockServer, finalQueryPathMap);
+    },
+    // eslint-disable-next-line
+    () => mockServer.listen(port, () => console.log(`Listening on port: ${port}`))
+  )(rawMocks);
+}
+
 module.exports = {
+  init,
   areEquivalent,
+  getMocks,
   queryString,
   parseQueryString,
   paramsToRegex,
   toBasePath,
-  rawMocks,
   toQueryMocks,
   toQueryPathMap,
   route,
