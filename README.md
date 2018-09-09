@@ -1,5 +1,7 @@
 # Getting Started
 
+[HelloWorld example repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
+
 1. Create a simple mock files directory
 
     `mkdir mocks`
