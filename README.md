@@ -76,7 +76,7 @@ The wait time (milliseconds) before the server responds. Useful for including ar
 ##### response
 Everything inside this key will be the response given by the server in `json` format.
 
-#### Path paramater endpoint
+### Path paramater endpoint
 
 ```javascript
   {
@@ -103,7 +103,7 @@ Everything inside this key will be the response given by the server in `json` fo
   `curl http://localhost:8080/example/param/123/second/1234`
 
 
-#### query string endpoint
+### query string endpoint
 
 ```javascript
   {
@@ -129,7 +129,7 @@ Everything inside this key will be the response given by the server in `json` fo
 
   `curl http://localhost:8080/querystring?name=foo`
 
-#### query string and path parameter endpoint
+### query string and path parameter endpoint
 ```javascript
 {
     "path": "/pathparam/:param/querystring?name=foo",
@@ -156,7 +156,7 @@ Everything inside this key will be the response given by the server in `json` fo
 `curl http://localhost:8080/pathparam/123/queryString?name=foo`
 
 
-#### query string with parameters
+### query string with parameters
 
 *This framework allows for parameters in the querystring itself,
 so you can catch any value for a given key*
@@ -191,7 +191,7 @@ so you can catch any value for a given key*
 `curl http://localhost:8080/pathparam/123/querystring?name=whatever&age=28`
 
 
-##### IMPORTANT !!!!
+### IMPORTANT !!!!
 If you use a `somekey=:param` in your query string, avoid creating endpoints that also
 explicitly define a value for that `somekey=valueHere`, otherwise the server will incorrectly respond
 with whichever endpoint happens to come up first.
@@ -220,7 +220,7 @@ with whichever endpoint happens to come up first.
   }
 }
 
-// some other file somewhere, nows theres a conflict
+// some other file somewhere, now theres a conflict!
 {
     "path": "/pathparam/:param/querystring?somekey=valueHere&age=28",
     "methods": {
