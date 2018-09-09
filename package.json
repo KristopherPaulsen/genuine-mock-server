@@ -19,15 +19,9 @@
     "test": "jest",
     "start": "nodemon mockServer/server.js"
   },
-  "contributors": [
-    {
-      "name": "Kristopher C. Paulsen",
-      "email": "kristopherpaulsen+npm@gmail.com"
-    },
-    {
-      "name": "Christopher Pond",
-      "email": "TBA"
-    }
-  ],
+  "author": {
+    "name": "Kristopher C. Paulsen",
+    "email": "kristopherpaulsen+npm@gmail.com"
+  },
   "license": "MIT License"
 }
