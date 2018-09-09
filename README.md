@@ -198,7 +198,7 @@ with whichever endpoint happens to come up first.
 *Will have a conflict*
 ``` javascript
 {
-    "path": "/pathparam/:param/querystring?name=:foo&age=28",
+    "path": "/pathparam/:param/querystring?somekey=:foo&age=28",
     "methods": {
       "get": {
         "statusCode": 200,
