@@ -15,42 +15,44 @@
    A file named Foobar could map to any endpoint. Naming conventions
    are entirely up to you!*
 
-```javascript
-{
-  "path": "/example",
-  "methods": {
-    "get": {
-      "response": {
-        "key": "This is the get response!"
+    ```javascript
+    {
+      "path": "/example",
+      "methods": {
+        "get": {
+          "response": {
+            "key": "This is the get response!"
+          }
+        }
       }
     }
-  }
-}
 
-```
+    ```
 
 3. Create a script to start your mock server
 
     `vim server.js`
 
-```javascript
+    ```javascript
 
-const { init } = require('genuine-mock-server');
+    const { init } = require('genuine-mock-server');
 
-init({
-  port: 8080,
-  pathToFiles: './mocks',
-  filePattern: '*.json',
-});
+    init({
+      port: 8080,
+      pathToFiles: './mocks',
+      filePattern: '*.json',
+    });
 
-```
+    ```
 
 
-Use your prefered script watcher (We recommend nodemon)
+4. Use your prefered script watcher (We recommend nodemon)
 
-4. `nodemon server.js` or `node server.js`
+   `nodemon server.js` or `node server.js`
 
-5. `curl http://localhost:8080/example`
+5. Curl that bad-boy!
+
+   `curl http://localhost:8080/example`
 
 
 # Overview of Mock files
