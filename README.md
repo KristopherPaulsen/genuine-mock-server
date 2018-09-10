@@ -162,7 +162,7 @@ Everything inside this key will be the response given by the server in `json` fo
 so you can catch any value for a given key*
 
 ###### querysring placeholders
-`:foo` is a placeholder, but you can use `:anyWordHere`
+`:foo` is a just an example, you can use `:anyWordHere`, or any other name!
 
 
 ```javascript
