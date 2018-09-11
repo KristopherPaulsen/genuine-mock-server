@@ -11,7 +11,7 @@
 
    `vim mocks/example.json`
 
-   *Note folder structure, file names, etc DO NOT MATTER.
+   *Note*: folder structure, file names, etc DO NOT MATTER.
    A file named Foobar could map to any endpoint. Naming conventions
    are entirely up to you!*
 
