@@ -1,6 +1,6 @@
 # Getting Started
 
-[HelloWorld example repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
+[HelloWorld Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
 
 1. Create a simple mock files directory
 
@@ -11,7 +11,7 @@
 
    `vim mocks/example.json`
 
-   *Note folder structure, file names, etc DO NOT MATTER.
+   *Note*: folder structure, file names, etc DO NOT MATTER.
    A file named Foobar could map to any endpoint. Naming conventions
    are entirely up to you!*
 
@@ -40,11 +40,10 @@
     init({
       port: 8080,
       pathToFiles: './mocks',
-      filePattern: '*.json',
+      filePattern: '*.json', // whatever file extension you want to target
     });
 
     ```
-
 
 4. Use your prefered script watcher (We recommend nodemon)
 
@@ -57,8 +56,10 @@
 
 # Overview of Mock files
 
+*Note*: Mockfiles do *not* need to be json files, they can also be plain-ole
+node `file.js` files too! Simple create a `module.exports = {}` inside a `.js` file!
 
-Each endpiont should get one respective mock file. This file
+Each endpoint should get one respective mock file. This file
 describes the various http methods that can be used, and their respective responses
 
 ##### Path
