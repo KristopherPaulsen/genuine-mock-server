@@ -1,5 +1,5 @@
 {
-  "path": "/api/helloworld/example",
+  "path": "/helloworld/example",
   "methods": {
     "get": {
       "response": {

@@ -1,5 +1,5 @@
 {
-  "path": "/api/helloworld/queryendpoint?name=100",
+  "path": "/helloworld/queryendpoint?name=100",
   "methods": {
     "get": {
       "response": {

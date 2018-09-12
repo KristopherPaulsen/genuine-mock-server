@@ -1,5 +1,5 @@
 {
-  "path": "/api/helloworld/param/:param/second/:second",
+  "path": "/helloworld/param/:param/second/:second",
   "methods": {
     "get": {
       "response": {

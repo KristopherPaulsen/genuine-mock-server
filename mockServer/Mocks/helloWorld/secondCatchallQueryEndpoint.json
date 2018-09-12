@@ -1,5 +1,5 @@
 {
-  "path": "/api/helloworld/catchall/queryendpoint?name=:whatever&other=foobar",
+  "path": "/helloworld/catchall/queryendpoint?name=:whatever&other=foobar",
   "methods": {
     "get": {
       "response": {
