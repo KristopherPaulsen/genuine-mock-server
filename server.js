@@ -1,4 +1,4 @@
-const { init } = require('./MockingBird.js');
+const { init } = require('./mockServer/MockingBird.js');
 
 init({
   port: 8080,
