@@ -16,7 +16,8 @@
     "jest": "^23.5.0"
   },
   "scripts": {
-    "test": "jest",
+    "test":"jest",
+    "spec": "npm run test -- --watch",
     "start": "nodemon mockServer/server.js"
   },
   "author": {

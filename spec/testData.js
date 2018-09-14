@@ -1,3 +1,84 @@
+const singleParamQueryMock = {
+  path: '/api/:userId/queryendpoint?foo=100',
+  methods: {
+    get: {
+      statusCode: 200,
+      waitTime: 0,
+      response: {
+        key: 'This is the foo=100 get response',
+      },
+    },
+    put: {
+      statusCode: 200,
+      waitTime: 0,
+      response: {
+        key: 'This is the foo=100 put response',
+      },
+    },
+  },
+};
+
+const doubleParamQueryMock = {
+  path: '/api/:userId/param/:param/queryendpoint?foo=100',
+  methods: {
+    get: {
+      statusCode: 200,
+      waitTime: 0,
+      response: {
+        key: 'This is the foo=100 get response',
+      },
+    },
+    put: {
+      statusCode: 200,
+      waitTime: 0,
+      response: {
+        key: 'This is the foo=100 put response',
+      },
+    },
+  },
+};
+
+const blankQueryMock = {
+  path: '/api/:userId/queryendpoint',
+  methods: {
+    get: {
+      statusCode: 200,
+      waitTime: 0,
+      response: {
+        key: 'This is the blank query get response',
+      },
+    },
+    put: {
+      statusCode: 200,
+      waitTime: 0,
+      response: {
+        key: 'This is the blank query put response',
+      },
+    },
+  },
+};
+
+
+const multiQueryMock = {
+  path: '/api/:userId/queryendpoint?foo=100&bar=100',
+  methods: {
+    get: {
+      statusCode: 200,
+      waitTime: 0,
+      response: {
+        key: 'This is the multi-value query get response',
+      },
+    },
+    put: {
+      statusCode: 200,
+      waitTime: 0,
+      response: {
+        key: 'This is the multi-value query put response',
+      },
+    },
+  },
+};
+
 const mocks = [
   {
     path: '/api/users/:userId/endpoint',
@@ -235,6 +316,10 @@ const finalQueryPathMap = {
 
 module.exports = {
   mocks,
+  singleParamQueryMock,
+  doubleParamQueryMock,
+  blankQueryMock,
+  multiQueryMock,
   finalQueryPathMap,
   nonQueryMocks,
 };

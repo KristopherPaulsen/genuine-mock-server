@@ -13,6 +13,11 @@ const {
 
 const {
   mocks,
+  paramQueryMock,
+  singleParamQueryMock,
+  doubleParamQueryMock,
+  blankQueryMock,
+  multiQueryMock,
   nonQueryMocks,
   finalQueryPathMap
 } = require('./testData.js');
@@ -185,8 +190,8 @@ describe('parseQueryString()', () => {
 
 describe('toQueryMocks()', () => {
 
-  it('should transform query Mock into array of mocks', () => {
-    expect(toQueryMocks(mocks[1]))
+  it('should transform query Mock with single-path-param into array of mocks', () => {
+    expect(toQueryMocks(singleParamQueryMock))
       .toEqual([
         {
           "method": "get",
@@ -196,7 +201,7 @@ describe('toQueryMocks()', () => {
             "foo": "100"
           },
           "response": {
-            "key": "This is the foo=100 path-param get response"
+            "key": 'This is the foo=100 get response',
           }
         },
         {
@@ -207,14 +212,14 @@ describe('toQueryMocks()', () => {
             "foo": "100"
           },
           "response": {
-            "key": "This is the foo=100 path-param put response"
+            "key": 'This is the foo=100 put response',
           }
         },
       ]);
   });
 
-  it('should transform query Mock into array of mocks', () => {
-    expect(toQueryMocks(mocks[2]))
+  it('should transform query Mock with double-path-param into array of mocks', () => {
+    expect(toQueryMocks(doubleParamQueryMock))
       .toEqual([
         {
           "method": "get",
@@ -224,7 +229,7 @@ describe('toQueryMocks()', () => {
             "foo": "100"
           },
           "response": {
-            "key": "This is the foo=100 get response"
+            "key": 'This is the foo=100 get response',
           }
         },
         {
@@ -235,24 +240,49 @@ describe('toQueryMocks()', () => {
             "foo": "100"
           },
           "response": {
-            "key": "This is the foo=100 put response"
+            "key": 'This is the foo=100 put response',
           }
-        }
+        },
       ]);
   });
 
-  it('should transform query Mock into array of mocks', () => {
-    expect(toQueryMocks(mocks[3]))
+  it('should transform query Mock with no query into array of mocks', () => {
+    expect(toQueryMocks(blankQueryMock))
+      .toEqual([
+        {
+          "method": "get",
+          "statusCode": 200,
+          "waitTime": 0,
+          "query": {},
+          "response": {
+            "key": 'This is the blank query get response',
+          }
+        },
+        {
+          "method": "put",
+          "statusCode": 200,
+          "waitTime": 0,
+          "query": {},
+          "response": {
+            "key": 'This is the blank query put response',
+          }
+        },
+      ]);
+  });
+
+  it('should transform query Mock with multiple values into array of mocks', () => {
+    expect(toQueryMocks(multiQueryMock))
       .toEqual([
         {
           "method": "get",
           "statusCode": 200,
           "waitTime": 0,
           "query": {
-            "foo": "200"
+            "foo": "100",
+            "bar": "100",
           },
           "response": {
-            "key": "This is the foo=200 get response"
+            "key": 'This is the multi-value query get response',
           }
         },
         {
@@ -260,12 +290,13 @@ describe('toQueryMocks()', () => {
           "statusCode": 200,
           "waitTime": 0,
           "query": {
-            "foo": "200"
+            "foo": "100",
+            "bar": "100",
           },
           "response": {
-            "key": "This is the foo=200 put response"
+            "key": 'This is the multi-value query put response',
           }
-        }
+        },
       ]);
   });
 });
