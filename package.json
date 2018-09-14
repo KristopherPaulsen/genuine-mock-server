@@ -1,6 +1,6 @@
 {
   "name": "genuine-mock-server",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "A real fake mock server for http requests",
   "main": "server.js",
   "directories": {
@@ -16,7 +16,7 @@
     "jest": "^23.5.0"
   },
   "scripts": {
-    "test":"jest",
+    "test": "jest",
     "spec": "npm run test -- --watch",
     "start": "nodemon mockServer/server.js"
   },
