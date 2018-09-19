@@ -5,7 +5,7 @@ module.exports = {
       statusCode: 200,
       waitTime: 0,
       response: {
-        key: "no params, no body, no query response",
+        "foo": "Hello world!",
       }
     },
   ],
@@ -25,12 +25,12 @@ module.exports = {
       method: 'get',
       statusCode: 200,
       waitTime: 0,
-      params: {
+      query: {
         param: 'foo',
-        param2: 'fooagain',
+        paramtwo: 'fooagain',
       },
       response: {
-        key: "multi params response",
+        key: "multi query response",
       }
     },
   ],
