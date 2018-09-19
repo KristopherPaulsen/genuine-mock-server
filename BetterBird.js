@@ -5,20 +5,8 @@ const express = require('express');
 const {
   concat, toString, sortBy, flattenDeep,
   isEqual, flow, difference, keys,
-  toPairs, partial, replace, _, defaults,
+  toPairs, partial, replace, _,
 } = require('lodash');
-
-const DEFAULT_MOCK = {
-  waitTime: 0,
-  statusCode: 200,
-};
-
-const DEFAULT_REQUEST = {
-  body: {},
-  query: {},
-  params: {},
-  response: { default: 'response' },
-};
 
 const paramsToRegex = url => url.replace(/((?::|#)[\w-]*)/g, '[\\w-]*');
 
@@ -30,7 +18,7 @@ const getMocks = ({ pathToFiles, filePattern}) => (
 );
 
 const toKey = flow(
-  (body = {}, query = {}, params = {}) => [...toPairs(body), ...toPairs(query), ...toPairs(params)],
+  (...args) => args.map(toPairs),
   flattenDeep,
   toString,
   sortBy,
@@ -62,21 +50,20 @@ const flattenMocks = (mocks) => (
 );
 
 const route = (
-  res, stuff,
+  res, { statusCode, response, waitTime },
 ) => {
-  console.log(stuff);
   setTimeout(() => {
-    res.status(stuff.statusCode)
-      .send(stuff.response);
-  }, stuff.waitTime)
+    res.status(statusCode)
+       .send(response);
+  }, waitTime)
 };
 
 const registerRoutes = (server, mockMap) => (
   keys(mockMap).forEach(path => {
     keys(mockMap[path]).forEach(method => {
       server[method](path, ({ body, query, params }, res) => {
-        console.log(toKey(body, query, params));
-        route(res, mockMap[path][method][toKey(body, query, params)]);
+        const key = toKey(body, query, params);
+        route(res, mockMap[path][method][key]);
       });
     })
   })
