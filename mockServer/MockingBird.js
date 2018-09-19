@@ -25,6 +25,7 @@ const requestsToMap = (rawMockMap) => (
     ...mockMap,
     [path]: {
       ...mockMap[path].reduce((reqMap, { params, body, query, statusCode, waitTime, method, response }) => ({
+        ...reqMap,
         [method]: {
           ...reqMap[method],
           [toKey(body, query, params)]: {
@@ -89,7 +90,7 @@ const init = ({ port, filePattern, pathToFiles }) => {
   )(getMocks({ filePattern, pathToFiles }));
 }
 
-exports.module = {
+module.exports = {
   toKey,
   flattenMocks,
   requestsToMap,
