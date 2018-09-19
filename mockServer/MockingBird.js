@@ -7,7 +7,7 @@ const {
   flow, keys, toPairs, partial, replace, _,
 } = require('lodash');
 
-const hashToColon = (path) => (path.replace(/(#)(\w+)/, ':$2'));
+const hashToColon = (path) => (path.replace(/\/(#)(\w+)/gi, '\/:$2'));
 
 const getMocks = ({ pathToFiles, filePattern}) => (
   glob
@@ -100,6 +100,7 @@ const init = ({ port, filePattern, pathToFiles }) => {
 module.exports = {
   toKey,
   flattenMocks,
+  hashToColon,
   requestsToMap,
   init,
 };

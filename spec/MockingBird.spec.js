@@ -1,13 +1,13 @@
 const {
   mocks,
   flatMocks,
-  hashToColon,
   mockRequestMap,
 } = require('./testData.js');
 
 const {
   toKey,
   flattenMocks,
+  hashToColon,
   requestsToMap,
 } = require('../mockServer/MockingBird.js');
 
@@ -15,7 +15,23 @@ describe('flattenMocks()', () => {
   it('should flatten array of different endpoint mocks into one large mock map', () => {
     expect(flattenMocks(mocks)).toEqual(flatMocks);
   });
+
 });
+
+describe('hashToColon()', () => {
+  it('replaces single hash in path paramater with colon', () => {
+    expect(hashToColon('/api/param/#param/')).toEqual('/api/param/:param/');
+  });
+
+  it('replaces multiple hashes in path paramater with colon', () => {
+    expect(hashToColon('/api/param/#param/other/#other')).toEqual('/api/param/:param/other/:other');
+  });
+
+  it('replace only hash in path paramater, not in querystring', () => {
+    expect(hashToColon('/api/param/#param/querystring?foo=#stuff')).toEqual('/api/param/:param/querystring?foo=#stuff');
+  });
+});
+
 
 describe('toKey()', () => {
   it('should convert different group of objects, with the same values, to "equal" string', () => {
