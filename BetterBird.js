@@ -1,10 +1,14 @@
 const glob = require('glob');
 const path = require('path');
 const express = require('express');
-const { isEqual, flow, difference, keys } = require('lodash');
+const {
+  concat, toString, sortBy, flattenDeep,
+  isEqual, flow, difference, keys,
+  toPairs, partial, replace, _,
+} = require('lodash');
 
-const hash = ( str ) => { if (str.length % 32 > 0) str += Array(33 - str.length % 32).join("z"); var hash = '', bytes = [], i = j = k = a = 0, dict = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','1','2','3','4','5','6','7','8','9']; for (i = 0; i < str.length; i++ ) { ch = str.charCodeAt(i); bytes[j++] = (ch < 127) ? ch & 0xFF : 127; } var chunk_len = Math.ceil(bytes.length / 32); for (i=0; i<bytes.length; i++) { j += bytes[i]; k++; if ((k == chunk_len) || (i == bytes.length-1)) { a = Math.floor( j / k ); if (a < 32) hash += '0'; else if (a > 126) hash += 'z'; else hash += dict[  Math.floor( (a-32) / 2.76) ]; j = k = 0; } } return hash; }
-
+const stringHash = require('string-hash');
+const paramsToRegex = url => url.replace(/((?::|#)[\w-]*)/g, '[\\w-]*');
 
 const getMocks = ({ pathToFiles, filePattern}) => (
   glob
@@ -13,18 +17,94 @@ const getMocks = ({ pathToFiles, filePattern}) => (
   .map(file => require(path.resolve(file)))
 );
 
-const mocks = getMocks({ pathToFiles: './mockServer/Mocks/', filePattern: '*.js'});
+const toKey = flow(
+  (body, params) => [...toPairs(body), ...toPairs(params)],
+  array => array.length ? array : ['default', 'default'],
+  flattenDeep,
+  sortBy,
+  toString,
+);
 
-const toKey = ( body, params ) => (hash(keys(body, params).sort()));
+const requestsToMap = (rawMockMap) => (
+  keys(rawMockMap).reduce((mockMap, path) => ({
+    ...mockMap,
+    [path]: {
+      ...mockMap[path].requests.reduce((reqMap, { body, params, statusCode, waitTime, method, response }) => ({
+        [method]: {
+          ...reqMap[method],
+          [toKey(body, params)]: {
+            statusCode,
+            waitTime,
+            response,
+          }
+        }
+      }), {}),
+    }
+  }), rawMockMap)
+);
 
-const mapifyRequests = mocks.map(mock => ([
-  {
-    ...mock,
-    requests: mock.requests.reduce((requestMap, { body, params, response, ...request } ) => ({
-      ...request,
-      [toKey(body, params)]: response,
-    })),
-  }
-]));
+const nestRequests = (mocks) => (
+  mocks.reduce((accum, { path, requests } ) => ({
+    ...accum,
+    [path]: {
+      requests,
+    }
+  }), {})
+);
 
-console.log(JSON.stringify( mapifyRequests , null, 2 ));
+const route = (
+  res, stuff,
+) => {
+  console.log(stuff);
+  setTimeout(() => {
+    res.status(stuff.statusCode)
+      .send(stuff.response);
+  }, stuff.waitTime)
+};
+
+const registerRoutes = (server, mockMap) => (
+  keys(mockMap).forEach(path => {
+    keys(mockMap[path]).forEach(method => {
+      server[method](paramsToRegex(path), ({ body, query }, res) => {
+        console.log(body, query);
+        route(res, mockMap[path][method][toKey(body, query)]);
+      });
+    })
+  })
+)
+
+const init = ({ port, filePattern, pathToFiles }) => {
+  const mockServer = express();
+  const bodyParser = require('body-parser');
+
+  mockServer.use(bodyParser.json());
+  mockServer.use(bodyParser.urlencoded({
+      extended: true
+  }));
+
+  mockServer.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+  });
+
+  flow(
+    nestRequests,
+    requestsToMap,
+    partial(registerRoutes, mockServer, _),
+    () => mockServer.listen(port, () => console.log(`Listening on port: ${port}`))
+  )(getMocks({ filePattern, pathToFiles }));
+}
+
+const data = flow(
+  nestRequests,
+  requestsToMap,
+)(getMocks({ filePattern: '*.js', pathToFiles: './mockServer/Mocks/'}));
+
+init({
+  port: 8080,
+  pathToFiles: './mockServer/Mocks/',
+  filePattern: '*.js',
+});
