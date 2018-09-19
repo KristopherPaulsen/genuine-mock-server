@@ -1,11 +1,10 @@
 module.exports = {
-  path: '/api/betterbird/example',
-  requests: [
+  '/api/betterbird/example': [
     {
       statusCode: 200,
       waitTime: 0,
       method: 'get',
-      params: {},
+      query: {},
       response: {
         key: "I am empty response!",
       }
@@ -14,18 +13,18 @@ module.exports = {
       statusCode: 200,
       waitTime: 200,
       method: 'get',
-      params: {
+      query: {
         foo: 'bar',
       },
       response: {
-        key: "I am params response",
+        key: "I am query response",
       }
     },
     {
       method: 'get',
       statusCode: 200,
       waitTime: 200,
-      params: {
+      query: {
         foo: 'value here, IM DIFFEENT!',
       },
       body: {

@@ -18,21 +18,20 @@ const getMocks = ({ pathToFiles, filePattern}) => (
 );
 
 const toKey = flow(
-  (body, params) => [...toPairs(body), ...toPairs(params)],
-  array => array.length ? array : ['default', 'default'],
+  (body, query) => [...toPairs(body), ...toPairs(query)],
   flattenDeep,
-  sortBy,
   toString,
+  sortBy,
 );
 
 const requestsToMap = (rawMockMap) => (
   keys(rawMockMap).reduce((mockMap, path) => ({
     ...mockMap,
     [path]: {
-      ...mockMap[path].requests.reduce((reqMap, { body, params, statusCode, waitTime, method, response }) => ({
+      ...mockMap[path].reduce((reqMap, { body, query, statusCode, waitTime, method, response }) => ({
         [method]: {
           ...reqMap[method],
-          [toKey(body, params)]: {
+          [toKey(body, query)]: {
             statusCode,
             waitTime,
             response,
@@ -43,12 +42,10 @@ const requestsToMap = (rawMockMap) => (
   }), rawMockMap)
 );
 
-const nestRequests = (mocks) => (
-  mocks.reduce((accum, { path, requests } ) => ({
+const flattenMocks = (mocks) => (
+  mocks.reduce((accum, mock) => ({
     ...accum,
-    [path]: {
-      requests,
-    }
+    ...mock,
   }), {})
 );
 
@@ -99,12 +96,14 @@ const init = ({ port, filePattern, pathToFiles }) => {
 }
 
 const data = flow(
-  nestRequests,
+  flattenMocks,
   requestsToMap,
 )(getMocks({ filePattern: '*.js', pathToFiles: './mockServer/Mocks/'}));
 
-init({
-  port: 8080,
-  pathToFiles: './mockServer/Mocks/',
-  filePattern: '*.js',
-});
+console.log(JSON.stringify( data , null, 2 ));
+
+//init({
+  //port: 8080,
+  //pathToFiles: './mockServer/Mocks/',
+  //filePattern: '*.js',
+//});
