@@ -34,12 +34,12 @@ module.exports = {
       }
     },
   ],
-  '/api/helloworld/param/:param': [
+  '/api/helloworld/param/#param': [
     {
-      method: 'delete',
+      method: 'get',
       statusCode: 200,
       waitTime: 200,
-      query: {
+      params: {
         param: 'bar',
       },
       response: {
@@ -47,7 +47,7 @@ module.exports = {
       }
     },
     {
-      method: 'get',
+      method: 'delete',
       statusCode: 200,
       waitTime: 200,
       query: {

@@ -1,6 +1,7 @@
 const {
   mocks,
   flatMocks,
+  hashToColon,
   mockRequestMap,
 } = require('./testData.js');
 

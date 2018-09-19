@@ -7,6 +7,8 @@ const {
   flow, keys, toPairs, partial, replace, _,
 } = require('lodash');
 
+const hashToColon = (path) => (path.replace(/(#)(\w+)/, ':$2'));
+
 const getMocks = ({ pathToFiles, filePattern}) => (
   glob
   .sync(path.resolve(path.resolve(`${pathToFiles}/**/${filePattern}`)))
@@ -41,6 +43,13 @@ const flattenMocks = (mocks) => (
     ...accum,
     ...mock,
   }), {})
+);
+
+const hashesToColons = (flatMocks) => (
+   keys(flatMocks).reduce((noHashes, path) => ({
+    ...noHashes,
+    [hashToColon(path)]: flatMocks[path],
+  }), flatMocks)
 );
 
 const route = (
@@ -81,6 +90,7 @@ const init = ({ port, filePattern, pathToFiles }) => {
 
   flow(
     flattenMocks,
+    hashesToColons,
     requestsToMap,
     partial(registerRoutes, mockServer, _),
     () => mockServer.listen(port, () => console.log(`Listening on port: ${port}`))
