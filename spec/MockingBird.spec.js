@@ -43,14 +43,18 @@ describe('toKey()', () => {
       stillfake: 'stillanothervalue',
     };
 
-    const key1 = toKey(queryOne, paramsOne, bodyOne);
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
 
-    const key2 = toKey(queryTwo, paramsTwo, bodyTwo);
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
 
     expect(key1).toEqual(key2);
   });
 
   it('should convert different group of objects, with DIFFERENT values, to non-equal strings', () => {
+
+    const bodyOne = {
+      stillfake: 'stillanothervalue',
+    };
 
     const queryOne = {
       fakeKey: 'someValue',
@@ -60,7 +64,7 @@ describe('toKey()', () => {
       someOtherFakeKey: 'someOtherValue',
     };
 
-    const bodyOne = {
+    const bodyTwo = {
       stillfake: 'stillanothervalue',
     };
 
@@ -72,76 +76,95 @@ describe('toKey()', () => {
       someOtherFakeKey: 'oh no, a different value',
     };
 
-    const bodyTwo = {
-      stillfake: 'stillanothervalue',
-    };
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
 
-    const key1 = toKey(queryOne, paramsOne, bodyOne);
-
-    const key2 = toKey(queryTwo, paramsTwoWithDifferentValues, bodyTwo);
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwoWithDifferentValues);
 
     expect(key1).not.toEqual(key2);
   });
 
   it('should convert different objects, with NO values, to "equal" strings', () => {
 
+    const bodyOne = {};
     const queryOne = {};
     const paramsOne = {};
-    const bodyOne = {};
+
+    const bodyTwo = {};
     const queryTwo = {};
     const paramsTwo = {};
-    const bodyTwo = {};
 
-    const key1 = toKey(queryOne, paramsOne, bodyOne);
-    const key2 = toKey(queryTwo, paramsTwo, bodyTwo);
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
+
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
 
     expect(key1).toEqual(key2);
   });
 
   it('should convert different objects, which mirrored empty-objects, to "equal" strings', () => {
 
+    const bodyOne = {};
     const queryOne = {
       fakeValue: 'dummy',
     };
-
     const paramsOne = {};
 
-    const bodyOne = {};
-
-    const queryTwo = {
-      fakeValue: 'dummy',
-    }
-
-    const paramsTwo = {};
 
     const bodyTwo = {};
+    const queryTwo = { fakeValue: 'dummy', };
+    const paramsTwo = {};
 
-    const key1 = toKey(queryOne, paramsOne, bodyOne);
-    const key2 = toKey(queryTwo, paramsTwo, bodyTwo);
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
 
     expect(key1).toEqual(key2);
   });
 
   it('should convert different objects, which different empty-objects, to non-equal strings', () => {
 
-    const queryDifferentValue = {
-      fakeValue: 'I have a different value!',
-    };
-
+    const bodyOne = { place: 'holder' };
+    const queryOne = {};
     const paramsOne = {};
 
-    const bodyOne = {};
-
-    const queryTwo = {
-      fakeValue: 'dummy',
-    }
-
-    const paramsTwo = {};
 
     const bodyTwo = {};
+    const queryTwo = { place: 'holder' };
+    const paramsTwo = {};
 
-    const key1 = toKey(queryDifferentValue, paramsOne, bodyOne);
-    const key2 = toKey(queryTwo, paramsTwo, bodyTwo);
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
+
+    expect(key1).not.toEqual(key2);
+  });
+
+  it('should convert different objects (with same values) but the values are on different types (body, query, param), to non-equal strings', () => {
+
+
+    const bodyOne = {};
+    const queryOne = {};
+    const paramsOne = { foo: 'bar' };
+
+    const bodyTwo = {};
+    const queryTwo = { foo: 'bar' };
+    const paramsTwo = {};
+
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
+
+    expect(key1).not.toEqual(key2);
+  });
+
+  it('should convert different objects (with same values) but the values are on different types (body, query, param), to non-equal strings', () => {
+
+    const bodyOne = {};
+    const queryOne = { foo: 'bar' };
+    const paramsOne = {};
+
+    const bodyTwo =  {};
+    const queryTwo = {};
+    const paramsTwo = { foo: 'bar' };
+
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
+    const key2 = toKey(bodyTwo, queryOne, paramsTwo);
 
     expect(key1).not.toEqual(key2);
   });

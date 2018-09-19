@@ -21,6 +21,18 @@ module.exports = {
         key: "only params response",
       }
     },
+    {
+      method: 'get',
+      statusCode: 200,
+      waitTime: 0,
+      params: {
+        param: 'foo',
+        param2: 'fooagain',
+      },
+      response: {
+        key: "multi params response",
+      }
+    },
   ],
   '/api/helloworld/param/:param': [
     {

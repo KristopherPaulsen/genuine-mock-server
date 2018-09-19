@@ -13,11 +13,8 @@ const getMocks = ({ pathToFiles, filePattern}) => (
   .map(file => require(path.resolve(file)))
 );
 
-const toKey = flow(
-  (...args) => args.map(toPairs),
-  flattenDeep,
-  toString,
-  sortBy,
+const toKey = (body = {}, query = {}, params = {}) => (
+  [body, query, params].map(item => sortBy(JSON.stringify(item)))
 );
 
 const requestsToMap = (rawMockMap) => (
