@@ -1,325 +1,165 @@
-const singleParamQueryMock = {
-  path: '/api/:userId/queryendpoint?foo=100',
-  methods: {
-    get: {
-      statusCode: 200,
-      waitTime: 0,
-      response: {
-        key: 'This is the foo=100 get response',
-      },
-    },
-    put: {
-      statusCode: 200,
-      waitTime: 0,
-      response: {
-        key: 'This is the foo=100 put response',
-      },
-    },
-  },
-};
-
-const doubleParamQueryMock = {
-  path: '/api/:userId/param/:param/queryendpoint?foo=100',
-  methods: {
-    get: {
-      statusCode: 200,
-      waitTime: 0,
-      response: {
-        key: 'This is the foo=100 get response',
-      },
-    },
-    put: {
-      statusCode: 200,
-      waitTime: 0,
-      response: {
-        key: 'This is the foo=100 put response',
-      },
-    },
-  },
-};
-
-const blankQueryMock = {
-  path: '/api/:userId/queryendpoint',
-  methods: {
-    get: {
-      statusCode: 200,
-      waitTime: 0,
-      response: {
-        key: 'This is the blank query get response',
-      },
-    },
-    put: {
-      statusCode: 200,
-      waitTime: 0,
-      response: {
-        key: 'This is the blank query put response',
-      },
-    },
-  },
-};
-
-
-const multiQueryMock = {
-  path: '/api/:userId/queryendpoint?foo=100&bar=100',
-  methods: {
-    get: {
-      statusCode: 200,
-      waitTime: 0,
-      response: {
-        key: 'This is the multi-value query get response',
-      },
-    },
-    put: {
-      statusCode: 200,
-      waitTime: 0,
-      response: {
-        key: 'This is the multi-value query put response',
-      },
-    },
-  },
-};
-
 const mocks = [
   {
-    path: '/api/users/:userId/endpoint',
-    methods: {
-      get: {
+    '/api/example/param/:param': [
+      {
+        method: 'get',
         statusCode: 200,
         waitTime: 0,
         response: {
-          key: 'This is the nonQueryEndpoint get response',
-        },
+          key: "no params, no body, no query response",
+        }
       },
-      put: {
+      {
+        method: 'get',
         statusCode: 200,
         waitTime: 0,
-        response: {
-          key: 'This is the nonQueryEndpoint put response',
+        params: {
+          param: 'foo'
         },
+        response: {
+          key: "only params response",
+        }
       },
-    },
+      {
+        method: 'get',
+        statusCode: 200,
+        waitTime: 200,
+        query: {
+          param: 'bar',
+        },
+        response: {
+          key: "query only response",
+        }
+      },
+      {
+        method: 'get',
+        statusCode: 200,
+        waitTime: 200,
+        query: {
+          foo: 'value here, IM DIFFEENT!',
+        },
+        params: {
+          param: 'param value here',
+        },
+        response: {
+          key: "params AND query response",
+        }
+      },
+      {
+        method: 'get',
+        statusCode: 200,
+        waitTime: 200,
+        query: {
+          foo: 'value here, IM DIFFEENT!',
+        },
+        params: {
+          param: 'param value here',
+        },
+        body: {
+          baz: "still a different value",
+        }
+        response: {
+          key: "params, query, body response",
+        }
+      },
+    ],
   },
   {
-    path: '/api/:userId/param/:param/queryendpoint?foo=100',
-    methods: {
-      get: {
-        statusCode: 200,
+    '/api/example/otherparam/:param': [
+      {
+        method: 'get',
         waitTime: 0,
-        response: {
-          key: 'This is the foo=100 path-param get response',
-        },
-      },
-      put: {
         statusCode: 200,
-        waitTime: 0,
-        response: {
-          key: 'This is the foo=100 path-param put response',
+        params: {
+          otherparam: 'bar',
         },
-      },
-    },
-  },
-  {
-    path: '/api/:userId/queryendpoint?foo=100',
-    methods: {
-      get: {
-        statusCode: 200,
-        waitTime: 0,
         response: {
-          key: 'This is the foo=100 get response',
-        },
-      },
-      put: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          key: 'This is the foo=100 put response',
-        },
-      },
-    },
-  },
-  {
-    path: '/api/:userId/queryendpoint?foo=200',
-    methods: {
-      get: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          key: 'This is the foo=200 get response',
-        },
-      },
-      put: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          key: 'This is the foo=200 put response',
-        },
-      },
-    },
-  },
-  {
-    path: '/api/:userId/queryendpoint',
-    methods: {
-      get: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          key: 'This is the blank query endpoint get response',
-        },
-      },
-      put: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          key: 'This is the blank query endpoint put response',
-        },
-      },
-    },
-  },
-  {
-    path: '/external-api/jsonplaceholder.typicode.com/posts/5',
-    methods: {
-      get: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          external: ' I am the mocked external api data!',
-        },
-      },
-    },
-  },
+          key: 'response for otherparam endpoint here'
+        }
+      }
+    ]
+  }
 ];
 
-const nonQueryMocks = [
-  {
-    path: '/api/users/:userId/endpoint',
-    methods: {
-      get: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          key: 'This is the nonQueryEndpoint get response',
-        },
-      },
-      put: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          key: 'This is the nonQueryEndpoint put response',
-        },
-      },
-    },
-  },
-  {
-    path: '/external-api/jsonplaceholder.typicode.com/posts/5',
-    methods: {
-      get: {
-        statusCode: 200,
-        waitTime: 0,
-        response: {
-          external: ' I am the mocked external api data!',
-        },
-      },
-    },
-  },
-];
-
-const finalQueryPathMap = {
-  '/api/:userId/queryendpoint': [
+const flattenedMocks = {
+  '/api/example/param/:param': [
     {
       method: 'get',
       statusCode: 200,
       waitTime: 0,
-      query: {
-        foo: '100',
-      },
       response: {
-        key: 'This is the foo=100 get response',
-      },
-    },
-    {
-      method: 'put',
-      statusCode: 200,
-      waitTime: 0,
-      query: {
-        foo: '100',
-      },
-      response: {
-        key: 'This is the foo=100 put response',
-      },
+        key: "no params, no body, no query response",
+      }
     },
     {
       method: 'get',
       statusCode: 200,
       waitTime: 0,
-      query: {
-        foo: '200',
+      params: {
+        param: 'foo'
       },
       response: {
-        key: 'This is the foo=200 get response',
-      },
-    },
-    {
-      method: 'put',
-      statusCode: 200,
-      waitTime: 0,
-      query: {
-        foo: '200',
-      },
-      response: {
-        key: 'This is the foo=200 put response',
-      },
+        key: "only params response",
+      }
     },
     {
       method: 'get',
       statusCode: 200,
-      waitTime: 0,
-      query: {},
-      response: {
-        key: 'This is the blank query endpoint get response',
+      waitTime: 200,
+      query: {
+        param: 'bar',
       },
+      response: {
+        key: "query only response",
+      }
     },
     {
-      method: 'put',
+      method: 'get',
       statusCode: 200,
-      waitTime: 0,
-      query: {},
-      response: {
-        key: 'This is the blank query endpoint put response',
+      waitTime: 200,
+      query: {
+        foo: 'value here, IM DIFFEENT!',
       },
+      params: {
+        param: 'param value here',
+      },
+      response: {
+        key: "params AND query response",
+      }
+    },
+    {
+      method: 'get',
+      statusCode: 200,
+      waitTime: 200,
+      query: {
+        foo: 'value here, IM DIFFEENT!',
+      },
+      params: {
+        param: 'param value here',
+      },
+      body: {
+        baz: "still a different value",
+      }
+      response: {
+        key: "params, query, body response",
+      }
     },
   ],
-  '/api/:userId/param/:param/queryendpoint': [
+  '/api/example/otherparam/:param': [
     {
       method: 'get',
-      statusCode: 200,
       waitTime: 0,
-      query: {
-        foo: '100',
+      statusCode: 200,
+      params: {
+        otherparam: 'bar',
       },
       response: {
-        key: 'This is the foo=100 path-param get response',
-      },
-    },
-    {
-      method: 'put',
-      statusCode: 200,
-      waitTime: 0,
-      query: {
-        foo: '100',
-      },
-      response: {
-        key: 'This is the foo=100 path-param put response',
-      },
-    },
-  ],
-};
+        key: 'response for otherparam endpoint here'
+      }
+    }
+  ]
+}
 
 module.exports = {
   mocks,
-  singleParamQueryMock,
-  doubleParamQueryMock,
-  blankQueryMock,
-  multiQueryMock,
-  finalQueryPathMap,
-  nonQueryMocks,
 };
