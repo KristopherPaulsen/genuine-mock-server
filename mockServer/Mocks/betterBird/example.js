@@ -4,7 +4,17 @@ module.exports = {
       statusCode: 200,
       waitTime: 0,
       method: 'get',
-      query: {},
+      params: {
+        example: 'foo'
+      },
+      response: {
+        key: "WAT",
+      }
+    },
+    {
+      statusCode: 200,
+      waitTime: 0,
+      method: 'get',
       response: {
         key: "I am empty response!",
       }

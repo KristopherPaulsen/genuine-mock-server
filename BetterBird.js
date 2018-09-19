@@ -1,13 +1,25 @@
 const glob = require('glob');
 const path = require('path');
+const bodyParser = require('body-parser');
 const express = require('express');
 const {
   concat, toString, sortBy, flattenDeep,
   isEqual, flow, difference, keys,
-  toPairs, partial, replace, _,
+  toPairs, partial, replace, _, defaults,
 } = require('lodash');
 
-const stringHash = require('string-hash');
+const DEFAULT_MOCK = {
+  waitTime: 0,
+  statusCode: 200,
+};
+
+const DEFAULT_REQUEST = {
+  body: {},
+  query: {},
+  params: {},
+  response: { default: 'response' },
+};
+
 const paramsToRegex = url => url.replace(/((?::|#)[\w-]*)/g, '[\\w-]*');
 
 const getMocks = ({ pathToFiles, filePattern}) => (
@@ -18,7 +30,7 @@ const getMocks = ({ pathToFiles, filePattern}) => (
 );
 
 const toKey = flow(
-  (body, query) => [...toPairs(body), ...toPairs(query)],
+  (body = {}, query = {}, params = {}) => [...toPairs(body), ...toPairs(query), ...toPairs(params)],
   flattenDeep,
   toString,
   sortBy,
@@ -28,10 +40,10 @@ const requestsToMap = (rawMockMap) => (
   keys(rawMockMap).reduce((mockMap, path) => ({
     ...mockMap,
     [path]: {
-      ...mockMap[path].reduce((reqMap, { body, query, statusCode, waitTime, method, response }) => ({
+      ...mockMap[path].reduce((reqMap, { params, body, query, statusCode, waitTime, method, response }) => ({
         [method]: {
           ...reqMap[method],
-          [toKey(body, query)]: {
+          [toKey(body, query, params)]: {
             statusCode,
             waitTime,
             response,
@@ -62,9 +74,9 @@ const route = (
 const registerRoutes = (server, mockMap) => (
   keys(mockMap).forEach(path => {
     keys(mockMap[path]).forEach(method => {
-      server[method](paramsToRegex(path), ({ body, query }, res) => {
-        console.log(body, query);
-        route(res, mockMap[path][method][toKey(body, query)]);
+      server[method](path, ({ body, query, params }, res) => {
+        console.log(toKey(body, query, params));
+        route(res, mockMap[path][method][toKey(body, query, params)]);
       });
     })
   })
@@ -72,7 +84,6 @@ const registerRoutes = (server, mockMap) => (
 
 const init = ({ port, filePattern, pathToFiles }) => {
   const mockServer = express();
-  const bodyParser = require('body-parser');
 
   mockServer.use(bodyParser.json());
   mockServer.use(bodyParser.urlencoded({
@@ -88,22 +99,15 @@ const init = ({ port, filePattern, pathToFiles }) => {
   });
 
   flow(
-    nestRequests,
+    flattenMocks,
     requestsToMap,
     partial(registerRoutes, mockServer, _),
     () => mockServer.listen(port, () => console.log(`Listening on port: ${port}`))
   )(getMocks({ filePattern, pathToFiles }));
 }
 
-const data = flow(
-  flattenMocks,
-  requestsToMap,
-)(getMocks({ filePattern: '*.js', pathToFiles: './mockServer/Mocks/'}));
-
-console.log(JSON.stringify( data , null, 2 ));
-
-//init({
-  //port: 8080,
-  //pathToFiles: './mockServer/Mocks/',
-  //filePattern: '*.js',
-//});
+init({
+  port: 8080,
+  pathToFiles: './mockServer/Mocks/',
+  filePattern: '*.js',
+});
