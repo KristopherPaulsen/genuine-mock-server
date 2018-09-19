@@ -14,11 +14,11 @@ module.exports = {
       method: 'get',
       statusCode: 200,
       waitTime: 0,
-      params: {
-        param: 'foo'
+      query: {
+        bar: 'foo'
       },
       response: {
-        key: "only params response",
+        key: "only query response",
       }
     },
     {
