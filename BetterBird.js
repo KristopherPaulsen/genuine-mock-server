@@ -51,19 +51,19 @@ const flattenMocks = (mocks) => (
 
 const route = (
   res, { statusCode, response, waitTime },
-) => {
-  setTimeout(() => {
+) => (
+  setTimeout(() => (
     res.status(statusCode)
-       .send(response);
-  }, waitTime)
-};
+       .send(response)
+  ), waitTime)
+);
 
 const registerRoutes = (server, mockMap) => (
   keys(mockMap).forEach(path => {
     keys(mockMap[path]).forEach(method => {
       server[method](path, ({ body, query, params }, res) => {
-        const key = toKey(body, query, params);
-        route(res, mockMap[path][method][key]);
+        const reqKey = toKey(body, query, params);
+        route(res, mockMap[path][method][reqKey]);
       });
     })
   })
