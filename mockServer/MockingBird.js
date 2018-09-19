@@ -2,12 +2,7 @@ const glob = require('glob');
 const path = require('path');
 const bodyParser = require('body-parser');
 const express = require('express');
-const {
-  concat, toString, sortBy, flattenDeep,
-  flow, keys, toPairs, partial, replace, _,
-} = require('lodash');
-
-const hashToColon = (path) => (path.replace(/\/(#)(\w+)/gi, '\/:$2'));
+const { sortBy, flow, keys, partial, _ } = require('lodash');
 
 const getMocks = ({ pathToFiles, filePattern}) => (
   glob
@@ -15,8 +10,10 @@ const getMocks = ({ pathToFiles, filePattern}) => (
   .map(file => require(path.resolve(file)))
 );
 
+const hashToColon = (path) => (path.replace(/\/(#)(\w+)/gi, '\/:$2'));
+
 const toKey = (body = {}, query = {}, params = {}) => (
-  [body, query, params].map(item => sortBy(JSON.stringify(item)))
+  [body, query, params].map(reqData => sortBy(JSON.stringify(reqData)))
 );
 
 const requestsToMap = (rawMockMap) => (
