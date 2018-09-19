@@ -94,4 +94,5 @@ module.exports = {
   toKey,
   flattenMocks,
   requestsToMap,
+  init,
 };
