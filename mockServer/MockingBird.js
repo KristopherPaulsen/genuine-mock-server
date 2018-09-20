@@ -2,7 +2,19 @@ const glob = require('glob');
 const path = require('path');
 const bodyParser = require('body-parser');
 const express = require('express');
-const { sortBy, flow, keys, partial, _ } = require('lodash');
+const { defaults, sortBy, flow, keys, partial, _ } = require('lodash');
+
+const mockDefaults = {
+  waitTime: 0,
+  statusCode: 200,
+  method: 'get',
+  body: {},
+  query: {},
+  params: {},
+  response: {
+    'default': 'value was supplied',
+  }
+};
 
 const getMocks = ({ pathToFiles, filePattern}) => (
   glob
@@ -13,21 +25,19 @@ const getMocks = ({ pathToFiles, filePattern}) => (
 const hashToColon = (path) => (path.replace(/\/(#)(\w+)/gi, '\/:$2'));
 
 const toKey = (body = {}, query = {}, params = {}) => (
-  [body, query, params].map(reqData => sortBy(JSON.stringify(reqData)))
+  [body, query, params].map(flow(JSON.stringify, sortBy))
 );
 
 const requestsToMap = (rawMockMap) => (
   keys(rawMockMap).reduce((mockMap, path) => ({
     ...mockMap,
     [path]: {
-      ...mockMap[path].reduce((reqMap, { params, body, query, statusCode, waitTime, method, response }) => ({
+      ...mockMap[path].reduce((reqMap, { body, query, params, method, ...remaining }) => ({
         ...reqMap,
         [method]: {
           ...reqMap[method],
           [toKey(body, query, params)]: {
-            statusCode,
-            waitTime,
-            response,
+            ...remaining,
           }
         }
       }), {}),
@@ -40,6 +50,13 @@ const flattenMocks = (mocks) => (
     ...accum,
     ...mock,
   }), {})
+);
+
+const ensureDefaults = (mockDefaults, flatMocks) => (
+  keys(flatMocks).reduce((accum, path) => ({
+    ...accum,
+    [path]: accum[path].map(data => defaults(data, mockDefaults)),
+  }), flatMocks)
 );
 
 const hashesToColons = (flatMocks) => (
@@ -88,6 +105,7 @@ const init = ({ port, filePattern, pathToFiles }) => {
   flow(
     flattenMocks,
     hashesToColons,
+    partial(ensureDefaults, mockDefaults),
     requestsToMap,
     partial(registerRoutes, mockServer, _),
     () => mockServer.listen(port, () => console.log(`Listening on port: ${port}`))
