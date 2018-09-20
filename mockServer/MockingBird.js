@@ -32,12 +32,12 @@ const requestsToMap = (rawMockMap) => (
   keys(rawMockMap).reduce((mockMap, path) => ({
     ...mockMap,
     [path]: {
-      ...mockMap[path].reduce((reqMap, { body, query, params, method, ...remaining }) => ({
+      ...mockMap[path].reduce((reqMap, { body, query, params, method, ...response }) => ({
         ...reqMap,
         [method]: {
           ...reqMap[method],
           [toKey(body, query, params)]: {
-            ...remaining,
+            ...response,
           }
         }
       }), {}),
