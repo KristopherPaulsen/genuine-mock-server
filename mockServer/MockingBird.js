@@ -18,7 +18,7 @@ const mockDefaults = {
 
 const getMocks = ({ pathToFiles, filePattern}) => (
   glob
-  .sync(path.resolve(path.resolve(`${pathToFiles}/**/${filePattern}`)))
+  .sync(path.resolve(`${pathToFiles}/**/${filePattern}`))
   .map(file => require(path.resolve(file)))
 );
 
