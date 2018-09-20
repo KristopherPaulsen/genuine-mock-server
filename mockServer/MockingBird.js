@@ -3,6 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const express = require('express');
 const { defaults, sortBy, flow, keys, partial, _ } = require('lodash');
+const md5 = require('md5');
 
 const mockDefaults = {
   waitTime: 0,
@@ -25,7 +26,7 @@ const getMocks = ({ pathToFiles, filePattern}) => (
 const hashToColon = (path) => (path.replace(/\/(#)(\w+)/gi, '\/:$2'));
 
 const toKey = (body = {}, query = {}, params = {}) => (
-  [body, query, params].map(flow(JSON.stringify, sortBy))
+  [body, query, params].map(flow(JSON.stringify, sortBy, md5))
 );
 
 const requestsToMap = (rawMockMap) => (
