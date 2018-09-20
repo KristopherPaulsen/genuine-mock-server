@@ -18,7 +18,7 @@ module.exports = {
         bar: 'foo'
       },
       response: {
-        key: "only query response",
+        key: "single query response",
       }
     },
     {
@@ -26,38 +26,24 @@ module.exports = {
       statusCode: 200,
       waitTime: 0,
       query: {
-        param: 'foo',
-        paramtwo: 'fooagain',
+        bar: 'foo',
+        bar2: 'fooagain',
       },
       response: {
         key: "multi query response",
       }
     },
   ],
-  '/api/helloworld/param/#param': [
+  '/api/helloworld/paramName/#paramName': [
     {
       method: 'get',
       statusCode: 200,
       waitTime: 200,
       params: {
-        param: 'bar',
+        paramName: 'bar',
       },
       response: {
-        key: "query only response",
-      }
-    },
-    {
-      method: 'delete',
-      statusCode: 200,
-      waitTime: 200,
-      query: {
-        foo: 'value here, IM DIFFEENT!',
-      },
-      params: {
-        param: 'param value here',
-      },
-      response: {
-        key: "params AND query response",
+        key: "single param only response",
       }
     },
     {
@@ -68,7 +54,7 @@ module.exports = {
         foo: 'value here, IM DIFFEENT!',
       },
       params: {
-        param: 'param value here',
+        paramName: 'param value here',
       },
       body: {
         baz: "still a different value",
