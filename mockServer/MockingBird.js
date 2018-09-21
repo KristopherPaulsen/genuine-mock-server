@@ -87,6 +87,10 @@ const registerRoutes = (server, mockMap) => (
   })
 )
 
+const startListening = (server, port) => (
+  server.listen(port, () => console.log(`Listening on port: ${port}`))
+);
+
 const init = ({ port, filePattern, pathToFiles }) => {
   const mockServer = express();
 
@@ -108,9 +112,9 @@ const init = ({ port, filePattern, pathToFiles }) => {
     hashesToColons,
     partial(ensureDefaults, mockDefaults),
     requestsToMap,
-    partial(registerRoutes, mockServer, _),
-    () => mockServer.listen(port, () => console.log(`Listening on port: ${port}`))
-  )(getMocks({ filePattern, pathToFiles }));
+    partial(registerRoutes, mockServer),
+    partial(startListening, mockServer, port),
+  )(getMocks({ filePattern, pathToFiles}));
 }
 
 module.exports = {
