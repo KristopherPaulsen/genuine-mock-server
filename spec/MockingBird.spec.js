@@ -6,9 +6,11 @@ const {
 
 const {
   toKey,
+  mockDefaults,
   flattenMocks,
   hashToColon,
   requestsToMap,
+  ensureDefaults,
 } = require('../mockServer/MockingBird.js');
 
 describe('flattenMocks()', () => {
@@ -232,4 +234,127 @@ describe('requestsToMap()', () => {
     expect(requestsToMap(mockRequestFlatMocks)).toEqual(mockRequestMap);
 
   });
+});
+
+describe('ensureDefaults()', () => {
+
+  it('adds defaults to mock requests if undefined', () => {
+    const flatMocks = {
+      '/api/dummyEndpoint': [
+        {
+          response: {
+            key: "dummy endpoint one response",
+          }
+        },
+      ],
+      '/api/dummyEndpointTwo': [
+        {
+          response: {
+            key: "dummy endpoint two response",
+          }
+        },
+      ]
+    };
+
+    const mocksWithDefaults = ensureDefaults(mockDefaults, flatMocks);
+
+    expect(mocksWithDefaults).toEqual({
+      '/api/dummyEndpoint': [
+        {
+          method: 'get',
+          statusCode: 200,
+          waitTime: 0,
+          body: {},
+          query: {},
+          params: {},
+          response: {
+            key: "dummy endpoint one response",
+          }
+        },
+      ],
+      '/api/dummyEndpointTwo': [
+        {
+          method: 'get',
+          statusCode: 200,
+          waitTime: 0,
+          body: {},
+          query: {},
+          params: {},
+          response: {
+            key: "dummy endpoint two response",
+          }
+        },
+      ]
+    });
+  })
+
+  it('adds defaults without removing currently defined values', () => {
+    const flatMocks = {
+      '/api/dummyEndpoint': [
+        {
+          waitTime: 1000,
+          method: 'delete',
+          statusCode: 500,
+          body: {
+            dummy: 'dummy value',
+          },
+          query: {
+            dummy: 'dummy value',
+          },
+          params: {
+            dummy: 'dummy value',
+          },
+          response: {
+
+            key: "dummy endpoint one response",
+          }
+        }
+      ],
+      '/api/dummyEndpointTwo': [
+        {
+          response: {
+            key: "dummy endpoint two response",
+          }
+        },
+      ]
+    };
+
+    const mocksWithDefaults = ensureDefaults(mockDefaults, flatMocks);
+
+    expect(mocksWithDefaults).toEqual({
+      '/api/dummyEndpoint': [
+        {
+          waitTime: 1000,
+          method: 'delete',
+          statusCode: 500,
+          body: {
+            dummy: 'dummy value',
+          },
+          query: {
+            dummy: 'dummy value',
+          },
+          params: {
+            dummy: 'dummy value',
+          },
+          response: {
+
+            key: "dummy endpoint one response",
+          }
+        }
+      ],
+      '/api/dummyEndpointTwo': [
+        {
+          method: 'get',
+          statusCode: 200,
+          waitTime: 0,
+          body: {},
+          query: {},
+          params: {},
+          response: {
+            key: "dummy endpoint two response",
+          }
+        },
+      ]
+    });
+  })
 });

@@ -115,6 +115,8 @@ const init = ({ port, filePattern, pathToFiles }) => {
 
 module.exports = {
   toKey,
+  mockDefaults,
+  ensureDefaults,
   flattenMocks,
   hashToColon,
   requestsToMap,
