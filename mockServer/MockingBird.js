@@ -29,6 +29,13 @@ const toKey = (body = {}, query = {}, params = {}) => (
   [body, query, params].map(flow(JSON.stringify, sortBy, md5))
 );
 
+const withPath = (path, rawMocks) => (
+  rawMocks.map(mock => ({
+    ...mock,
+    path,
+  }))
+);
+
 const toRequestMap = (rawMocks) => (
   rawMocks.reduce((requestMap, rawMock) => {
 
@@ -88,17 +95,13 @@ const init = ({ port, filePattern, pathToFiles }) => {
   });
 
   flow(
-    flattenMocks,
-    hashesToColons,
-    partial(ensureDefaults, mockDefaults),
-    requestsToMap,
-    partial(registerRoutes, mockServer),
-    partial(startListening, mockServer, port),
+    toRequestMap,
   )(getMocks({ filePattern, pathToFiles}));
 }
 
 module.exports = {
   toKey,
   toRequestMap,
+  withPath,
   init,
 };
