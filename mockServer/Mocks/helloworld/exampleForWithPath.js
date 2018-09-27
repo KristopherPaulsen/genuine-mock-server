@@ -1,6 +1,6 @@
 import { withPath } from '../../MockingBird.js';
 
-module.exports = withPath('/api/helloworld,example', [
+module.exports = withPath('/api/helloworld/example', [
   {
     method: 'get',
     statusCode: 200,
