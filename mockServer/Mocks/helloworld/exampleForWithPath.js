@@ -1,6 +1,7 @@
-module.exports = [
+import { withPath } from '../../MockingBird.js';
+
+module.exports = withPath('/api/helloworld,example', [
   {
-    path: '/api/helloworld/example',
     method: 'get',
     statusCode: 200,
     waitTime: 0,
@@ -9,7 +10,6 @@ module.exports = [
     }
   },
   {
-    path: '/api/helloworld/querystring',
     method: 'get',
     statusCode: 200,
     waitTime: 0,
@@ -21,7 +21,6 @@ module.exports = [
     }
   },
   {
-    path: '/api/helloworld/querystring',
     method: 'get',
     statusCode: 200,
     waitTime: 0,
@@ -34,7 +33,6 @@ module.exports = [
     }
   },
   {
-    path: '/api/helloworld/paramName/#paramName',
     method: 'get',
     statusCode: 200,
     waitTime: 200,
@@ -46,7 +44,6 @@ module.exports = [
     }
   },
   {
-    path: '/api/helloworld/paramName/#paramName',
     method: 'get',
     statusCode: 200,
     waitTime: 200,
