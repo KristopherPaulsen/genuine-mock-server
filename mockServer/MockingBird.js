@@ -29,42 +29,22 @@ const toKey = (body = {}, query = {}, params = {}) => (
   [body, query, params].map(flow(JSON.stringify, sortBy, md5))
 );
 
-const requestsToMap = (rawMockMap) => (
-  keys(rawMockMap).reduce((mockMap, path) => ({
-    ...mockMap,
-    [path]: {
-      ...mockMap[path].reduce((reqMap, { body, query, params, method, ...response }) => ({
-        ...reqMap,
+const toRequestMap = (rawMocks) => (
+  rawMocks.reduce((requestMap, rawMock) => {
+
+    const { path, body, query, params, method, ...restOfMock } = defaults(rawMock, mockDefaults);
+
+    return {
+      ...requestMap,
+      [hashToColon(path)]: {
+        ...requestMap[path],
         [method]: {
-          ...reqMap[method],
-          [toKey(body, query, params)]: {
-            ...response,
-          }
+          ...requestMap[method],
+          [toKey(body, query, params)]: restOfMock,
         }
-      }), {}),
+      }
     }
-  }), rawMockMap)
-);
-
-const flattenMocks = (mocks) => (
-  mocks.reduce((accum, mock) => ({
-    ...accum,
-    ...mock,
-  }), {})
-);
-
-const ensureDefaults = (mockDefaults, flatMocks) => (
-  keys(flatMocks).reduce((accum, path) => ({
-    ...accum,
-    [path]: accum[path].map(data => defaults(data, mockDefaults)),
-  }), flatMocks)
-);
-
-const hashesToColons = (flatMocks) => (
-   keys(flatMocks).reduce((noHashes, path) => ({
-    ...noHashes,
-    [hashToColon(path)]: flatMocks[path],
-  }), flatMocks)
+  }, {})
 );
 
 const route = (
@@ -119,10 +99,6 @@ const init = ({ port, filePattern, pathToFiles }) => {
 
 module.exports = {
   toKey,
-  mockDefaults,
-  ensureDefaults,
-  flattenMocks,
-  hashToColon,
-  requestsToMap,
+  toRequestMap,
   init,
 };

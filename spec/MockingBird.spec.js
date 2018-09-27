@@ -1,39 +1,84 @@
 const {
-  mocks,
-  flatMocks,
-  mockRequestMap,
-} = require('./testData.js');
-
-const {
   toKey,
-  mockDefaults,
-  flattenMocks,
-  hashToColon,
-  requestsToMap,
-  ensureDefaults,
+  toRequestMap
 } = require('../mockServer/MockingBird.js');
 
-describe('flattenMocks()', () => {
-  it('should flatten array of different endpoint mocks into one large mock map', () => {
-    expect(flattenMocks(mocks)).toEqual(flatMocks);
-  });
+describe('toRequestMap()', () => {
+  it('should convert all requests for the given path to a "request-map"', () => {
+    const rawMocks = [
+      {
+        path: "/api/example/param/:param",
+        method: 'get',
+        statusCode: 200,
+        waitTime: 0,
+        response: {
+          key: "no params, no body, no query response",
+        }
+      },
+      {
+        path: "/api/example/param/:param",
+        method: 'delete',
+        statusCode: 200,
+        waitTime: 0,
+        params: {
+          param: 'param value here',
+        },
+        response: {
+          key: "only params response",
+        }
+      },
+      {
+        path: "/api/example/otherparam/:param",
+        method: 'delete',
+        statusCode: 200,
+        waitTime: 0,
+        query: {
+          foo: 'another value',
+        },
+        params: {
+          param: 'param value here',
+        },
+        response: {
+          key: "params, query response",
+        }
+      },
+    ];
 
+    expect(toRequestMap(rawMocks)).toEqual({
+      "/api/example/param/:param": {
+        "get": {
+          [toKey({}, {}, {})]: {
+            "statusCode": 200,
+            "waitTime": 0,
+            "response": {
+              "key": "no params, no body, no query response"
+            }
+          },
+        },
+        "delete": {
+          [toKey({}, {}, { param: 'param value here' })]: {
+            "statusCode": 200,
+            "waitTime": 0,
+            "response": {
+              "key": "only params response"
+            }
+          },
+        }
+      },
+      "/api/example/otherparam/:param": {
+        "delete": {
+          [toKey({}, { foo: "another value"}, { param: "param value here" })]: {
+            "statusCode": 200,
+            "waitTime": 0,
+            "response": {
+              "key": "params, query response"
+            }
+          }
+        }
+      }
+    });
+  });
 });
-
-describe('hashToColon()', () => {
-  it('replaces single hash in path paramater with colon', () => {
-    expect(hashToColon('/api/param/#param/')).toEqual('/api/param/:param/');
-  });
-
-  it('replaces multiple hashes in path paramater with colon', () => {
-    expect(hashToColon('/api/param/#param/other/#other')).toEqual('/api/param/:param/other/:other');
-  });
-
-  it('replace only hash in path paramater, not in querystring', () => {
-    expect(hashToColon('/api/param/#param/querystring?foo=#stuff')).toEqual('/api/param/:param/querystring?foo=#stuff');
-  });
-});
-
 
 describe('toKey()', () => {
   it('should convert different group of objects, with the same values, to "equal" string', () => {
@@ -187,174 +232,4 @@ describe('toKey()', () => {
 
     expect(key1).not.toEqual(key2);
   });
-});
-
-describe('requestsToMap()', () => {
-  it('should convert all requests for the given path to a "request-map"', () => {
-    const mockRequestFlatMocks = {
-      '/api/example/param/:param': [
-        {
-          method: 'get',
-          statusCode: 200,
-          waitTime: 0,
-          response: {
-            key: "no params, no body, no query response",
-          }
-        },
-        {
-          method: 'delete',
-          statusCode: 200,
-          waitTime: 0,
-          params: {
-            param: 'param value here',
-          },
-          response: {
-            key: "only params response",
-          }
-        },
-      ],
-      '/api/example/otherparam/:param': [
-        {
-          method: 'delete',
-          statusCode: 200,
-          waitTime: 0,
-          query: {
-            foo: 'another value',
-          },
-          params: {
-            param: 'param value here',
-          },
-          response: {
-            key: "params, query response",
-          }
-        },
-      ]
-    };
-
-    expect(requestsToMap(mockRequestFlatMocks)).toEqual(mockRequestMap);
-
-  });
-});
-
-describe('ensureDefaults()', () => {
-
-  it('adds defaults to mock requests if undefined', () => {
-    const flatMocks = {
-      '/api/dummyEndpoint': [
-        {
-          response: {
-            key: "dummy endpoint one response",
-          }
-        },
-      ],
-      '/api/dummyEndpointTwo': [
-        {
-          response: {
-            key: "dummy endpoint two response",
-          }
-        },
-      ]
-    };
-
-    const mocksWithDefaults = ensureDefaults(mockDefaults, flatMocks);
-
-    expect(mocksWithDefaults).toEqual({
-      '/api/dummyEndpoint': [
-        {
-          method: 'get',
-          statusCode: 200,
-          waitTime: 0,
-          body: {},
-          query: {},
-          params: {},
-          response: {
-            key: "dummy endpoint one response",
-          }
-        },
-      ],
-      '/api/dummyEndpointTwo': [
-        {
-          method: 'get',
-          statusCode: 200,
-          waitTime: 0,
-          body: {},
-          query: {},
-          params: {},
-          response: {
-            key: "dummy endpoint two response",
-          }
-        },
-      ]
-    });
-  })
-
-  it('adds defaults without removing currently defined values', () => {
-    const flatMocks = {
-      '/api/dummyEndpoint': [
-        {
-          waitTime: 1000,
-          method: 'delete',
-          statusCode: 500,
-          body: {
-            dummy: 'dummy value',
-          },
-          query: {
-            dummy: 'dummy value',
-          },
-          params: {
-            dummy: 'dummy value',
-          },
-          response: {
-
-            key: "dummy endpoint one response",
-          }
-        }
-      ],
-      '/api/dummyEndpointTwo': [
-        {
-          response: {
-            key: "dummy endpoint two response",
-          }
-        },
-      ]
-    };
-
-    const mocksWithDefaults = ensureDefaults(mockDefaults, flatMocks);
-
-    expect(mocksWithDefaults).toEqual({
-      '/api/dummyEndpoint': [
-        {
-          waitTime: 1000,
-          method: 'delete',
-          statusCode: 500,
-          body: {
-            dummy: 'dummy value',
-          },
-          query: {
-            dummy: 'dummy value',
-          },
-          params: {
-            dummy: 'dummy value',
-          },
-          response: {
-
-            key: "dummy endpoint one response",
-          }
-        }
-      ],
-      '/api/dummyEndpointTwo': [
-        {
-          method: 'get',
-          statusCode: 200,
-          waitTime: 0,
-          body: {},
-          query: {},
-          params: {},
-          response: {
-            key: "dummy endpoint two response",
-          }
-        },
-      ]
-    });
-  })
 });
