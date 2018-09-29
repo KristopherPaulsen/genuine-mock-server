@@ -1,6 +1,6 @@
-import { withPath } from '../../MockingBird.js';
+const { withPath } = require('../../MockingBird.js');
 
-module.exports = withPath('/api/helloworld/example', [
+module.exports = withPath('/api/helloworld/withPath', [
   {
     method: 'get',
     statusCode: 200,
@@ -60,4 +60,4 @@ module.exports = withPath('/api/helloworld/example', [
       key: "params, query, body response",
     }
   },
-];
+]);

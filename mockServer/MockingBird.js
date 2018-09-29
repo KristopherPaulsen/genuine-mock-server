@@ -2,10 +2,11 @@ const glob = require('glob');
 const path = require('path');
 const bodyParser = require('body-parser');
 const express = require('express');
-const { defaults, sortBy, flow, keys, partial, _ } = require('lodash');
+const { flatten, defaults, sortBy, flow, keys, partial, _ } = require('lodash');
 const md5 = require('md5');
 
 const mockDefaults = {
+  path: '',
   waitTime: 0,
   statusCode: 200,
   method: 'get',
@@ -18,9 +19,9 @@ const mockDefaults = {
 };
 
 const getMocks = ({ pathToFiles, filePattern}) => (
-  glob
-  .sync(path.resolve(`${pathToFiles}/**/${filePattern}`))
-  .map(file => require(path.resolve(file)))
+    glob
+    .sync(path.resolve(`${pathToFiles}/**/${filePattern}`))
+    .map(file => require(path.resolve(file)))
 );
 
 const hashToColon = (path) => (path.replace(/\/(#)(\w+)/gi, '\/:$2'));
@@ -37,7 +38,7 @@ const withPath = (path, rawMocks) => (
 );
 
 const toRequestMap = (rawMocks) => (
-  rawMocks.reduce((requestMap, rawMock) => {
+  flatten(rawMocks).reduce((requestMap, rawMock) => {
 
     const { path, body, query, params, method, ...restOfMock } = defaults(rawMock, mockDefaults);
 
@@ -96,6 +97,8 @@ const init = ({ port, filePattern, pathToFiles }) => {
 
   flow(
     toRequestMap,
+    partial(registerRoutes, mockServer, _),
+    partial(startListening, mockServer, port)
   )(getMocks({ filePattern, pathToFiles}));
 }
 

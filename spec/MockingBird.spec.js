@@ -4,6 +4,37 @@ const {
 } = require('../mockServer/MockingBird.js');
 
 describe('toRequestMap()', () => {
+
+  it('should pre-flatten raw mocks while building map', () => {
+    const rawMocks = [
+      [
+        {
+          path: "/api/example/param/:param",
+          method: 'get',
+          statusCode: 200,
+          waitTime: 0,
+          response: {
+            key: "no params, no body, no query response",
+          }
+        },
+      ]
+    ];
+
+    expect(toRequestMap(rawMocks)).toEqual({
+      "/api/example/param/:param": {
+        "get": {
+          [toKey({}, {}, {})]: {
+            "statusCode": 200,
+            "waitTime": 0,
+            "response": {
+              "key": "no params, no body, no query response"
+            }
+          },
+        },
+      },
+    });
+  });
+
   it('should convert all requests for the given path to a "request-map"', () => {
     const rawMocks = [
       {
