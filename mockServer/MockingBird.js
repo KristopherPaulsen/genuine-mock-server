@@ -2,7 +2,7 @@ const glob = require('glob');
 const path = require('path');
 const bodyParser = require('body-parser');
 const express = require('express');
-const { flatten, defaults, sortBy, flow, keys, partial, _ } = require('lodash');
+const { get, flatten, defaults, sortBy, flow, keys, partial, _ } = require('lodash');
 const md5 = require('md5');
 
 const mockDefaults = {
@@ -13,9 +13,7 @@ const mockDefaults = {
   body: {},
   query: {},
   params: {},
-  response: {
-    'default': 'value was supplied',
-  }
+  response: {}
 };
 
 const getMocks = ({ pathToFiles, filePattern}) => (
@@ -41,13 +39,14 @@ const toRequestMap = (rawMocks) => (
   flatten(rawMocks).reduce((requestMap, rawMock) => {
 
     const { path, body, query, params, method, ...restOfMock } = defaults(rawMock, mockDefaults);
+    const normalizedPath = hashToColon(path)
 
     return {
       ...requestMap,
-      [hashToColon(path)]: {
-        ...requestMap[path],
+      [normalizedPath]: {
+        ...requestMap[normalizedPath],
         [method]: {
-          ...requestMap[method],
+          ...get(requestMap, [normalizedPath, method], {}),
           [toKey(body, query, params)]: restOfMock,
         }
       }
