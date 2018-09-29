@@ -1,6 +1,6 @@
-const { withPath } = require('../../MockingBird.js');
+const { allPaths } = require('../../MockingBird.js');
 
-module.exports = withPath('/api/helloworld/withPath', [
+module.exports = allPaths('/api/helloworld/withPath', [
   {
     method: 'get',
     statusCode: 200,
