@@ -236,6 +236,57 @@ describe('toKey()', () => {
     expect(key1).toEqual(key2);
   });
 
+  it('should convert different group of objects, with nested same values, to "equal" string', () => {
+
+    const queryOne = {
+      fakeKey: 'someValue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const paramsOne = {
+      someOtherFakeKey: 'someOtherValue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const bodyOne = {
+      stillfake: 'stillanothervalue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const queryTwo = {
+      fakeKey: 'someValue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const paramsTwo = {
+      someOtherFakeKey: 'someOtherValue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const bodyTwo = {
+      stillfake: 'stillanothervalue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
+
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
+
+    expect(key1).toEqual(key2);
+  });
+
   it('should convert different group of objects, with DIFFERENT values, to non-equal strings', () => {
 
     const bodyOne = {
@@ -265,6 +316,57 @@ describe('toKey()', () => {
     const key1 = toKey(bodyOne, queryOne, paramsOne);
 
     const key2 = toKey(bodyTwo, queryTwo, paramsTwoWithDifferentValues);
+
+    expect(key1).not.toEqual(key2);
+  });
+
+  it('should convert different group of objects, with different nested same values, to non-equal string', () => {
+
+    const queryOne = {
+      fakeKey: 'someValue',
+      nested: {
+        other: 'different value'
+      }
+    };
+
+    const paramsOne = {
+      someOtherFakeKey: 'someOtherValue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const bodyOne = {
+      stillfake: 'stillanothervalue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const queryTwo = {
+      fakeKey: 'someValue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const paramsTwo = {
+      someOtherFakeKey: 'someOtherValue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const bodyTwo = {
+      stillfake: 'stillanothervalue',
+      nested: {
+        other: 'value'
+      }
+    };
+
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
+
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
 
     expect(key1).not.toEqual(key2);
   });
