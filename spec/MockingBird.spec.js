@@ -1,6 +1,7 @@
 const {
   toKey,
-  toRequestMap
+  toRequestMap,
+  hashToColon,
 } = require('../mockServer/MockingBird.js');
 
 describe('toRequestMap()', () => {
@@ -388,4 +389,26 @@ describe('toKey()', () => {
     expect(key1).not.toEqual(key2);
   });
 
+});
+
+describe('hashToColon()', () => {
+  it('should replace hash with colon in simple path', () => {
+    expect(hashToColon('/api/param/#param')).toEqual('/api/param/:param');
+  });
+
+  it('should replace multiples hashes with colons in simple path', () => {
+    expect(hashToColon('/api/param/#param/paramtwo/#paramtwo')).toEqual('/api/param/:param/paramtwo/:paramtwo');
+  });
+
+  it('should replace multiples separated hashes with colons in simple path', () => {
+    expect(hashToColon('/api/param/#param/foo/paramtwo/#paramtwo')).toEqual('/api/param/:param/foo/paramtwo/:paramtwo');
+  });
+
+  it('should NOT replace hashes with colons in tricky-dicky path', () => {
+    expect(hashToColon('/api/querystring?foo=bar&#other=thing')).toEqual('/api/querystring?foo=bar&#other=thing');
+  });
+
+  it('should NOT replace hashes with colons in even-more tricky-dicky path', () => {
+    expect(hashToColon(`/api/querystring?foo='{"path":"/api/param/#param/"}'`)).toEqual(`/api/querystring?foo='{"path":"/api/param/#param/"}'`);
+  });
 });

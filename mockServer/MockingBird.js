@@ -16,13 +16,21 @@ const mockDefaults = {
   response: {}
 };
 
+const hashToColon = (path) => {
+  if(!path.match(/(\/[\w-_]+\?.+)/)) {
+    return path.replace(/#/g, ':');
+  }
+
+  const [_, paramPath, queryPath] = path.match(/(.+)(\/[\w-_]+\?.+)/);
+
+  return `${paramPath.replace(/#/g, ':')}${queryPath}`;
+}
+
 const getMocks = ({ pathToFiles, filePattern}) => (
     glob
     .sync(path.resolve(`${pathToFiles}/**/${filePattern}`))
     .map(file => require(path.resolve(file)))
 );
-
-const hashToColon = (path) => (path.replace(/\/(#)(\w+)/gi, '\/:$2'));
 
 const toKey = (body = {}, query = {}, params = {}) => (
   [body, query, params].map(flow(JSON.stringify, sortBy, md5))
@@ -104,6 +112,7 @@ const init = ({ port, filePattern, pathToFiles }) => {
 module.exports = {
   toKey,
   toRequestMap,
+  hashToColon,
   withPath,
   init,
 };
