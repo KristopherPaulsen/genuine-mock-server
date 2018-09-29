@@ -404,11 +404,22 @@ describe('hashToColon()', () => {
     expect(hashToColon('/api/param/#param/foo/paramtwo/#paramtwo')).toEqual('/api/param/:param/foo/paramtwo/:paramtwo');
   });
 
-  it('should NOT replace hashes with colons in tricky-dicky path', () => {
+  it('should NOT replace hashes with colons in querystring', () => {
     expect(hashToColon('/api/querystring?foo=bar&#other=thing')).toEqual('/api/querystring?foo=bar&#other=thing');
   });
 
-  it('should NOT replace hashes with colons in even-more tricky-dicky path', () => {
-    expect(hashToColon(`/api/querystring?foo='{"path":"/api/param/#param/"}'`)).toEqual(`/api/querystring?foo='{"path":"/api/param/#param/"}'`);
+  it('should NOT replace hashes with colons in json filled query string', () => {
+    expect(hashToColon(`/api/param/#param/querystring?foo='{"path":"/api/param/#param/"}'`))
+      .toEqual(`/api/param/:param/querystring?foo='{"path":"/api/param/#param/"}'`);
+  });
+
+  it('should NOT replace hashes with colons in json filled querystring containg a querystring', () => {
+    expect(hashToColon(`/api/param/#param/querystring?foo='{"path":"/api/param/#param/querystring?foo=#bar"}'`))
+      .toEqual(`/api/param/:param/querystring?foo='{"path":"/api/param/#param/querystring?foo=#bar"}'`);
+  });
+
+  it('should NOT replace hashes with colons in json filled query string that is also uri encoded', () => {
+    expect(hashToColon(`/api/param/#param/querystring?foo='%7B%22path%22:%22/api/param/#param/querystring?foo=#bar%22%7D'`))
+      .toEqual(`/api/param/:param/querystring?foo='%7B%22path%22:%22/api/param/#param/querystring?foo=#bar%22%7D'`);
   });
 });

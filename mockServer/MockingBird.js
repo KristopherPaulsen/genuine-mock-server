@@ -21,7 +21,7 @@ const hashToColon = (path) => {
     return path.replace(/#/g, ':');
   }
 
-  const [_, paramPath, queryPath] = path.match(/(.+)(\/[\w-_]+\?.+)/);
+  const [_, paramPath, queryPath] = path.match(/(.+?)(\/[\w-_]+\?.+)/);
 
   return `${paramPath.replace(/#/g, ':')}${queryPath}`;
 }
