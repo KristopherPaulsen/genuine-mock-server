@@ -4,28 +4,30 @@
 
 1. Create a simple mock files directory
 
-    `mkdir mocks`
+    ```
+    mkdir mocks
+    ```
 
 
 2. Create a simple mock file inside `mocks/`
 
-   `vim mocks/example.json`
+    ```
+    vim mocks/example.js
+    ```
 
-   *Note*: folder structure, file names, etc DO NOT MATTER.
+   *Note: folder structure, file names, etc DO NOT MATTER.
    A file named Foobar could map to any endpoint. Naming conventions
    are entirely up to you!*
 
     ```javascript
-    {
-      "path": "/example",
-      "methods": {
-        "get": {
-          "response": {
-            "key": "This is the get response!"
-          }
+    module.exports = [
+        {
+            path: '/api/example',
+            method: 'get',
+            response: {
+            key: 'hello world!'
         }
-      }
-    }
+    ];
 
     ```
 
@@ -40,255 +42,108 @@
     init({
       port: 8080,
       pathToFiles: './mocks',
-      filePattern: '*.json', // whatever file extension you want to target
+      filePattern: '*.js', // whatever file extension you want to target
     });
 
     ```
 
 4. Use your prefered script watcher (We recommend nodemon)
 
-   `nodemon server.js` or `node server.js`
+   ```
+   nodemon server.js` or `node server.js
+   ```
 
 5. Curl that bad-boy!
 
-   `curl http://localhost:8080/example`
+   ```
+   curl http://localhost:8080/example
+   ```
 
-
-# Overview of Mock files
-
-*Note*: Mockfiles do *not* need to be json files, they can also be plain-ole
-node `file.js` files too! Simple create a `module.exports = {}` inside a `.js` file!
-
-Each endpoint should get one respective mock file. This file
-describes the various http methods that can be used, and their respective responses
-
-##### Path
-The endpoint URL. Can include multiple paramaters, querystrings, or any combination!
-
-(See examples below)
-
-##### methods
-An object of keys (each an `http` method), describing the various responses
-
-##### statusCode
-The status code of the returned http response. All status codes are supported!
-
-##### waitTime
-The wait time (milliseconds) before the server responds. Useful for including artificial delays
-
-##### response
-Everything inside this key will be the response given by the server in `json` format.
-
-### Path paramater endpoint
-
+# Overview of Mock Files
 ```javascript
-  {
-    "path": "/example/param/:param/second/#second",
-    "methods": {
-      "get": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the get response!"
+module.exports = [
+    {
+        path: '/api/example',
+        method: 'get',
+        response: {
+          key: 'hello world!'
         }
-      },
-      "delete": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the delete response!"
-        }
-      }
-    }
-  }
+    },
+    {
+      // mock file here...
+    },
+];
 ```
 
-  `curl http://localhost:8080/example/param/123/second/1234`
+| key        | type    | description                                          | Required                                                                  |
+|------------|---------|----------------------------------------------------- |---------------------------------------------------------------------------|
+| path       | string  | The endpoint base url                                | Required (but can be added in different ways, see 'adding paths to mocks' |
+| method     | string  | The lowercase http method                            | optional (defaults to 'get')                                              |
+| statusCode | Integer | The response code returned by server                 | optional (defaults to 200)                                                |
+| waitTime   | Integer | The wait time before the mock server responds        | optional (defaults to 0)                                                  |
+| params     | Object  | An object of key / value pairs for path params       | optional (key names should match param path names)                        |
+| body       | Object  | An object of key / value pairs for the body request  | optional                                                                  |
+| query      | Object  | An object of key / value pairs for the querystring   | optional                                                                  |
+| response   | Object  | An object representing your desired response         | optional (but why wouldn't you include one?)                              |
 
 
-### query string endpoint
+# Adding Paths to Mocks
 
-```javascript
-  {
-    "path": "/querystring?name=foo",
-    "methods": {
-      "get": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the get response!"
-        }
-      },
-      "delete": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the delete response!"
-        }
-      }
-    }
-  }
-```
+##### Adding the same path multiple times
 
-  `curl http://localhost:8080/querystring?name=foo`
-
-### query string and path parameter endpoint
-```javascript
-{
-    "path": "/pathparam/:param/querystring?name=foo",
-    "methods": {
-      "get": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the get response!"
-        }
-      },
-      "delete": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the delete response!"
-        }
-      }
-    }
-  }
-}
-```
-
-`curl http://localhost:8080/pathparam/123/queryString?name=foo`
-
-
-### query string with parameters
-
-*This framework allows for parameters in the querystring itself,
-so you can catch any value for a given key*
-
-###### querysring placeholders
-`:foo` is a just an example, you can use `:anyWordHere`, or any other name!
+Mock files are entirely unopinionated. You can add different mocks for entirely different paths, if you so desire.
+You can also keep mock files on a one-basepath-to-file stategy. In this case, instead of writing out paths over and over,
+you can:
 
 
 ```javascript
-{
-    "path": "/pathparam/:param/querystring?name=:foo&age=28",
-    "methods": {
-      "get": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the get response!"
-        }
-      },
-      "delete": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the delete response!"
-        }
-      }
-    }
-  }
-}
+    const { defaultPath } = require('genuine-mock-server');
+
+    module.exports = defaultPath('/api/example', [
+        {
+            // path gets added by defaultPath helper method
+            method: 'get',
+            response: {
+              key: 'hello world!'
+            }
+        },
+        {
+            // path gets added by defaultPath helper method
+            method: 'get',
+            response: {
+              key: 'hello world!'
+            }
+        },
+    ]);
 ```
 
-`curl http://localhost:8080/pathparam/123/querystring?name=whatever&age=28`
+*Note: This method is mostly just a simple reduce function, but it won't clobber any
+paths you HAVE defined. See below for an example*
 
 
-### IMPORTANT !!!!
-If you use a `somekey=:param` in your query string, avoid creating endpoints that also
-explicitly define a value for that `somekey=valueHere`, otherwise the server will incorrectly respond
-with whichever endpoint happens to come up first.
+#### Adding the same path multiple times, except for one
 
+You can, if you so desire, add the same path to all mock files, *except* for a few of them.
+Probably best to avoid if you're building our mock files manually, as that increases the chances
+of confusion when reading them.
 
-*Will have a conflict*
-``` javascript
-{
-    "path": "/pathparam/:param/querystring?somekey=:foo&age=28",
-    "methods": {
-      "get": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the get response!"
-        }
-      },
-      "delete": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the delete response!"
-        }
-      }
-    }
-  }
-}
-
-// some other file somewhere, now theres a conflict!
-{
-    "path": "/pathparam/:param/querystring?somekey=valueHere&age=28",
-    "methods": {
-      "get": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the get response!"
-        }
-      },
-      "delete": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the delete response!"
-        }
-      }
-    }
-  }
-}
-
-```
-
-*No conflicts, different set of key-values*
 ```javascript
-{
-    "path": "/pathparam/:param/querystring?somekey=:foo&age=28",
-    "methods": {
-      "get": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the get response!"
-        }
-      },
-      "delete": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the delete response!"
-        }
-      }
-    }
-  }
-}
+    const { defaultPath } = require('genuine-mock-server');
 
-// some other file somewhere, but no conflicts due to separate key-value lists
-{
-    "path": "/pathparam/:param/querystring?somekey=:foo&age=28&anotherKey=value",
-    "methods": {
-      "get": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the get response!"
-        }
-      },
-      "delete": {
-        "statusCode": 200,
-        "waitTime": 0,
-        "response": {
-          "key": "This is the delete response!"
-        }
-      }
-    }
-  }
-}
+    module.exports = defaultPath('/api/example', [
+        {
+            // path gets added by defaultPath helper method
+            method: 'get',
+            response: {
+              key: 'hello world!'
+            }
+        },
+        {
+            path: '/api/alreadyDefined' // pre-defined path is ignored by helper function
+            method: 'get',
+            response: {
+              key: 'hello world!'
+            }
+        },
+    ]);
 ```

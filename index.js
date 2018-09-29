@@ -1,6 +1,6 @@
-const { init, allPaths } = require('./mockServer/MockingBird.js');
+const { init, defaultPath } = require('./mockServer/MockingBird.js');
 
 module.exports = {
   init,
-  allPaths,
+  defaultPath,
 }

@@ -36,10 +36,10 @@ const toKey = (body, query, params) => (
   [body, query, params].map(flow(JSON.stringify, sortBy, md5))
 );
 
-const allPaths = (path, rawMocks) => (
+const defaultPath = (path, rawMocks) => (
   rawMocks.map(mock => ({
     ...mock,
-    path,
+    ...(mock.path ? { [mock.path]: mock.path} : { path, }),
   }))
 );
 
@@ -113,6 +113,6 @@ module.exports = {
   toKey,
   toRequestMap,
   hashToColon,
-  allPaths,
+  defaultPath,
   init,
 };
