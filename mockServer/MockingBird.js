@@ -32,7 +32,7 @@ const getMocks = ({ pathToFiles, filePattern}) => (
     .map(file => require(path.resolve(file)))
 );
 
-const toKey = (body = {}, query = {}, params = {}) => (
+const toKey = (body, query, params) => (
   [body, query, params].map(flow(JSON.stringify, sortBy, md5))
 );
 
