@@ -7,7 +7,7 @@
 
 * [An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
 * [Getting Started](#getting-started)
-* [Building the mock server using files](#building-the-mock-server-using-files)
+* [Building the mock server using slurp mode](#building-the-mock-server-using-slurp-mode)
 * [Overview of Mock Files](#overview-of-mock-files)
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
 
@@ -58,7 +58,7 @@
    ```
 
 
-## Building the mock server using files
+## Building the Mock Server Using Slurp Mode
 
 There is also a *second* way to build the mock server, and that is using 'slurp' mode.
 You specify the path to the folders containing mock files, and a file-ending to slurp up
@@ -76,7 +76,7 @@ for storing your mocks.
     vim mocks/example.js
     ```
 
-   *Note: folder structure, file names, etc DO NOT MATTER. Files are slupred recursively.
+   *Note: folder structure, file names, etc DO NOT MATTER. Files are slurped recursively.
    A file named Foobar could map to any endpoint. Naming conventions
    are entirely up to you!*
 
