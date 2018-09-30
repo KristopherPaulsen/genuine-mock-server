@@ -7,10 +7,64 @@
 
 * [An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
 * [Getting Started](#getting-started)
+* [Building the mock server using files](#building-the-mock-server-using-files)
 * [Overview of Mock Files](#overview-of-mock-files)
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
 
 ## Getting Started
+1. Create a script to start your mock server at the git root of your project
+
+    ```bash
+    vim server.js
+    ```
+
+    ```javascript
+    // Inside server.js
+
+    const { init } = require('./mockServer/MockingBird.js');
+
+    const mocks = [
+      {
+        path: '/api/helloworld/simple',
+        method: 'get',
+        statusCode: 200,
+        waitTime: 0,
+        response: {
+          "key": "Hello world!",
+        }
+      },
+    ];
+
+    init({
+      port: 8080,
+      mocks: mocks,
+    });
+    ```
+
+2. Use your prefered script watcher (We recommend nodemon)
+
+   ```
+   nodemon server.js
+   ```
+   or
+   ```
+   node server.js
+   ```
+
+3. Curl that bad-boy!
+
+   ```bash
+   curl http://localhost:8080/api/example
+   ```
+
+
+## Building the mock server using files
+
+There is also a *second* way to build the mock server, and that is using 'slurp' mode.
+You specify the path to the folders containing mock files, and a file-ending to slurp up
+into the mock server. Slurp mode is useful if you want a file-to-endpoint naming convention
+for storing your mocks.
+
 1. Create a simple mock files directory
     ```bash
     mkdir mocks
@@ -22,7 +76,7 @@
     vim mocks/example.js
     ```
 
-   *Note: folder structure, file names, etc DO NOT MATTER.
+   *Note: folder structure, file names, etc DO NOT MATTER. Files are slupred recursively.
    A file named Foobar could map to any endpoint. Naming conventions
    are entirely up to you!*
 
@@ -117,7 +171,7 @@ module.exports = [
 
 ## Adding Paths to Mocks
 
-### One Array of mocks for different endpoints
+### One Array of Mocks for Different Endpoints
 
 If you want, you can simply write out different paths by hand in each mock blob.
 The ability to specificy different paths on a per-mock basis is useful if you're
@@ -144,7 +198,7 @@ module.exports = [
 
 </br>
 
-### One array of mocks for the same endpoint
+### One Array of Mocks for the Same Endpoint
 
 Writing out the same path over and over again is error prone, so a helper
 method is included to make things easier, should you so desire.
@@ -176,7 +230,7 @@ paths you HAVE defined. See below for an example*
 
 </br>
 
-### An array of mocks, mixed endpoints
+### An Array of Mocks, Mixed Endpoints
 
 You can, if you so desire, add the same path to all mock files, *except* for a few of them.
 

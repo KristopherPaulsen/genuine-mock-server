@@ -26,11 +26,15 @@ const hashToColon = (path) => {
   return `${paramPath.replace(/#/g, ':')}${queryPath}`;
 }
 
-const getMocks = ({ pathToFiles, filePattern}) => (
-    glob
+const getMocks = ({ mocks, pathToFiles, filePattern}) => {
+  if (mocks) {
+    return mocks;
+  }
+
+  return glob
     .sync(path.resolve(`${pathToFiles}/**/${filePattern}`))
     .map(file => require(path.resolve(file)))
-);
+};
 
 const toKey = (body, query, params) => (
   [body, query, params].map(flow(JSON.stringify, sortBy, md5))
@@ -86,7 +90,7 @@ const startListening = (server, port) => (
   server.listen(port, () => console.log(`Listening on port: ${port}`))
 );
 
-const init = ({ port, filePattern, pathToFiles }) => {
+const init = ({ port, filePattern, pathToFiles, mocks }) => {
   const mockServer = express();
 
   mockServer.use(bodyParser.json());
@@ -106,7 +110,7 @@ const init = ({ port, filePattern, pathToFiles }) => {
     toRequestMap,
     partial(registerRoutes, mockServer, _),
     partial(startListening, mockServer, port)
-  )(getMocks({ filePattern, pathToFiles}));
+  )(getMocks({ filePattern, pathToFiles, mocks}));
 }
 
 module.exports = {
