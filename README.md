@@ -21,7 +21,7 @@
     ```javascript
     // Inside server.js
 
-    const { init } = require('./mockServer/MockingBird.js');
+    const { init } = require('genuine-mock-server');
 
     const mocks = [
       {
@@ -54,7 +54,7 @@
 3. Curl that bad-boy!
 
    ```bash
-   curl http://localhost:8080/api/example
+   curl 'http://localhost:8080/api/helloworld/simple'
    ```
 
 
@@ -83,7 +83,7 @@ for storing your mocks.
     ```javascript
     module.exports = [
         {
-            path: '/api/example',
+            path: '/api/helloworld/simple',
             method: 'get',
             response: {
             key: 'hello world!'
@@ -123,7 +123,7 @@ for storing your mocks.
 5. Curl that bad-boy!
 
    ```bash
-   curl http://localhost:8080/api/example
+   curl http://localhost:8080/api/helloworld/example
    ```
 
 </br>
@@ -146,13 +146,13 @@ for storing your mocks.
 
 module.exports = [
     {
-        path: '/api/example/paramName/:paramName/querystring',
+        path: '/api/example/someparam/:someparam/querystring',
         method: 'post',
         body: {
             key: 'value'
         },
         params: {
-            paramName: 'value of param'
+            someparam: 'baz'
         },
         query: {
             foo: 'bar'
@@ -217,7 +217,10 @@ module.exports = defaultPath('/api/example', [
     },
     {
         // path gets added by defaultPath helper method
-        method: 'get',
+        method: 'post',
+        body: {
+          key: 'value',
+        },
         response: {
           key: 'hello world!'
         }
