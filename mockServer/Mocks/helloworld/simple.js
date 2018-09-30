@@ -1,5 +1,3 @@
-const { withPath } = require('../../MockingBird.js');
-
 module.exports = [
   {
     path: '/api/helloworld/simple',

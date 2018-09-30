@@ -1,6 +1,6 @@
 module.exports = [
   {
-    path: '/api/helloworld/example',
+    path: '/api/helloworld/multipath',
     method: 'get',
     statusCode: 200,
     waitTime: 0,
@@ -34,30 +34,30 @@ module.exports = [
     }
   },
   {
-    path: '/api/helloworld/paramName/#paramName',
+    path: '/api/helloworld/someparam/#someparam', // params can use # or : as delimiter
     method: 'get',
     statusCode: 200,
     waitTime: 200,
     params: {
-      paramName: 'bar',
+      someparam: 'bar',
     },
     response: {
       key: "single param only response",
     }
   },
   {
-    path: '/api/helloworld/paramName/#paramName',
+    path: '/api/helloworld/someparam/:someparam', // params can use # or : as delimiter
     method: 'get',
     statusCode: 200,
     waitTime: 200,
     query: {
-      foo: 'value here, IM DIFFEENT!',
+      foo: 'bar',
     },
     params: {
-      paramName: 'param value here',
+      someparam: 'bar',
     },
     body: {
-      baz: "still a different value",
+      baz: "foo",
     },
     response: {
       key: "params, query, body response",

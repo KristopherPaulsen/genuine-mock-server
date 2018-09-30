@@ -1,6 +1,6 @@
 const { defaultPath } = require('../../MockingBird.js');
 
-module.exports = defaultPath('/api/helloworld/withPath', [
+module.exports = defaultPath('/api/helloworld/defaultpath', [
   {
     method: 'get',
     statusCode: 200,
@@ -10,54 +10,12 @@ module.exports = defaultPath('/api/helloworld/withPath', [
     }
   },
   {
+    path: '/api/helloworld/definedpath'
     method: 'get',
     statusCode: 200,
     waitTime: 0,
-    query: {
-      bar: 'foo'
-    },
     response: {
-      key: "single query response",
-    }
-  },
-  {
-    method: 'get',
-    statusCode: 200,
-    waitTime: 0,
-    query: {
-      bar: 'foo',
-      bar2: 'fooagain',
-    },
-    response: {
-      key: "multi query response",
-    }
-  },
-  {
-    method: 'get',
-    statusCode: 200,
-    waitTime: 200,
-    params: {
-      paramName: 'bar',
-    },
-    response: {
-      key: "single param only response",
-    }
-  },
-  {
-    method: 'get',
-    statusCode: 200,
-    waitTime: 200,
-    query: {
-      foo: 'value here, IM DIFFEENT!',
-    },
-    params: {
-      paramName: 'param value here',
-    },
-    body: {
-      baz: "still a different value",
-    },
-    response: {
-      key: "params, query, body response",
+      key: "I wasn't overwritten by defaultPath!",
     }
   },
 ]);
