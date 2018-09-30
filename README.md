@@ -1,18 +1,24 @@
 # Genuine Mock Server
 
-[An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
-[Getting Started](#getting-started)
-[Overview of Mock Files](#overview-of-mock-files)
+</br>
+</br>
+
+#### Table of Contents
+
+* [An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
+* [Getting Started](#getting-started)
+* [Overview of Mock Files](#overview-of-mock-files)
+* [Adding Paths to Mocks](#adding-paths-to-mocks)
 
 ## Getting Started
 1. Create a simple mock files directory
-    ```
+    ```bash
     mkdir mocks
     ```
 
 2. Create a simple mock file inside `mocks/`
 
-    ```
+    ```bash
     vim mocks/example.js
     ```
 
@@ -34,7 +40,7 @@
 
 3. Create a script to start your mock server
 
-    ```
+    ```bash
     vim server.js
     ```
 
@@ -53,14 +59,20 @@
 4. Use your prefered script watcher (We recommend nodemon)
 
    ```
-   nodemon server.js` or `node server.js
+   nodemon server.js
+   ```
+   or
+   ```
+   node server.js
    ```
 
 5. Curl that bad-boy!
 
+   ```bash
+   curl http://localhost:8080/api/example
    ```
-   curl http://localhost:8080/example
-   ```
+
+</br>
 
 ## Overview of Mock Files
 
@@ -77,6 +89,7 @@
 
 ```javascript
 // Example File
+
 module.exports = [
     {
         path: '/api/example/paramName/:paramName/querystring',
@@ -100,63 +113,101 @@ module.exports = [
 ];
 ```
 
-## Adding Paths to Mocks
-##### Adding the same path multiple times #foo
+</br>
 
-Mock files are entirely unopinionated. You can add different mocks for entirely different paths, if you so desire.
-You can also keep mock files on a one-basepath-to-file stategy. In this case, instead of writing out paths over and over,
-you can:
+## Adding Paths to Mocks
+
+### One Array of mocks for different endpoints
+
+If you want, you can simply write out different paths by hand in each mock blob.
+The ability to specificy different paths on a per-mock basis is useful if you're
+building out mocks programatically, and want complete control.
+
+```javascript
+module.exports = [
+    {
+        path: '/api/path',
+        method: 'get',
+        response: {
+          key: 'hello world!'
+        }
+    },
+    {
+        path: '/api/differentpath/',
+        method: 'get',
+        response: {
+          key: 'hello world!'
+        }
+    },
+];
+```
+
+</br>
+
+### One array of mocks for the same endpoint
+
+Writing out the same path over and over again is error prone, so a helper
+method is included to make things easier, should you so desire.
 
 
 ```javascript
-    const { defaultPath } = require('genuine-mock-server');
+const { defaultPath } = require('genuine-mock-server');
 
-    module.exports = defaultPath('/api/example', [
-        {
-            // path gets added by defaultPath helper method
-            method: 'get',
-            response: {
-              key: 'hello world!'
-            }
-        },
-        {
-            // path gets added by defaultPath helper method
-            method: 'get',
-            response: {
-              key: 'hello world!'
-            }
-        },
-    ]);
+module.exports = defaultPath('/api/example', [
+    {
+        // path gets added by defaultPath helper method
+        method: 'get',
+        response: {
+          key: 'hello world!'
+        }
+    },
+    {
+        // path gets added by defaultPath helper method
+        method: 'get',
+        response: {
+          key: 'hello world!'
+        }
+    },
+]);
 ```
 
 *Note: This method is mostly just a simple reduce function, but it won't clobber any
 paths you HAVE defined. See below for an example*
 
+</br>
 
-#### Adding the same path multiple times, except for one
+### An array of mocks, mixed endpoints
 
 You can, if you so desire, add the same path to all mock files, *except* for a few of them.
-Probably best to avoid if you're building our mock files manually, as that increases the chances
-of confusion when reading them.
 
 ```javascript
-    const { defaultPath } = require('genuine-mock-server');
+const { defaultPath } = require('genuine-mock-server');
 
-    module.exports = defaultPath('/api/example', [
-        {
-            // path gets added by defaultPath helper method
-            method: 'get',
-            response: {
-              key: 'hello world!'
-            }
+module.exports = defaultPath('/api/example', [
+    {
+        // path gets added by defaultPath helper method
+        method: 'get',
+        response: {
+          key: 'hello world!'
+        }
+    },
+    {
+        // path gets added by defaultPath helper method
+        method: 'get',
+        query: {
+          foo: 'bar',
         },
-        {
-            path: '/api/alreadyDefined' // pre-defined path is ignored by helper function
-            method: 'get',
-            response: {
-              key: 'hello world!'
-            }
-        },
-    ]);
+        response: {
+          key: 'hello world!'
+        }
+    },
+    {
+        // path remains unchanged by helper method
+        path: '/api/alreadydefined/'
+        method: 'get',
+        response: {
+          key: 'hello world!'
+        }
+    },
+]);
 ```
-
