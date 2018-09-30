@@ -203,6 +203,25 @@ describe('toRequestMap()', () => {
 
 
 describe('toKey()', () => {
+
+  it('should convert different objects, with NO values, to "equal" strings', () => {
+
+    const bodyOne = {};
+    const queryOne = {};
+    const paramsOne = {};
+
+    const bodyTwo = {};
+    const queryTwo = {};
+    const paramsTwo = {};
+
+    const key1 = toKey(bodyOne, queryOne, paramsOne);
+
+    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
+
+    expect(key1).toEqual(key2);
+  });
+
+
   it('should convert different group of objects, with the same values, to "equal" string', () => {
 
     const queryOne = {
@@ -287,7 +306,7 @@ describe('toKey()', () => {
     expect(key1).toEqual(key2);
   });
 
-  it('should convert different group of objects, with DIFFERENT values, to non-equal strings', () => {
+  it('should convert different group of objects, with different values, to non-equal strings', () => {
 
     const bodyOne = {
       stillfake: 'stillanothervalue',
@@ -369,23 +388,6 @@ describe('toKey()', () => {
     const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
 
     expect(key1).not.toEqual(key2);
-  });
-
-  it('should convert different objects, with NO values, to "equal" strings', () => {
-
-    const bodyOne = {};
-    const queryOne = {};
-    const paramsOne = {};
-
-    const bodyTwo = {};
-    const queryTwo = {};
-    const paramsTwo = {};
-
-    const key1 = toKey(bodyOne, queryOne, paramsOne);
-
-    const key2 = toKey(bodyTwo, queryTwo, paramsTwo);
-
-    expect(key1).toEqual(key2);
   });
 
   it('should convert different objects, which mirrored empty-objects, to "equal" strings', () => {
@@ -506,7 +508,7 @@ describe('hashToColon()', () => {
     expect(hashToColon('/api/param/#param/foo/paramtwo/#paramtwo')).toEqual('/api/param/:param/foo/paramtwo/:paramtwo');
   });
 
-  it('should NOT replace hashes with colons in querystring', () => {
+  it('should not replace hashes with colons in querystring', () => {
     expect(hashToColon('/api/querystring?foo=bar&#other=thing')).toEqual('/api/querystring?foo=bar&#other=thing');
   });
 
@@ -539,6 +541,5 @@ describe('hashToColon()', () => {
     expect(hashToColon(`/api/param%20%20/#param%20%20/querystring?foo%253D'%257B%2522path%2522%253A%2522%252Fapi%252Fparam%252F%2523param%252Fquerystring%253Ffoo%253D%2523bar%2522%257D'`))
       .toEqual(`/api/param%20%20/:param%20%20/querystring?foo%253D'%257B%2522path%2522%253A%2522%252Fapi%252Fparam%252F%2523param%252Fquerystring%253Ffoo%253D%2523bar%2522%257D'`)
   });
-
 
 });

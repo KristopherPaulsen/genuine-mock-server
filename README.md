@@ -1,13 +1,14 @@
-# Getting Started
+# Genuine Mock Server
 
-[HelloWorld Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
+[An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
+[Getting Started](#getting-started)
+[Overview of Mock Files](#overview-of-mock-files)
 
+## Getting Started
 1. Create a simple mock files directory
-
     ```
     mkdir mocks
     ```
-
 
 2. Create a simple mock file inside `mocks/`
 
@@ -33,7 +34,9 @@
 
 3. Create a script to start your mock server
 
-    `vim server.js`
+    ```
+    vim server.js
+    ```
 
     ```javascript
 
@@ -59,21 +62,7 @@
    curl http://localhost:8080/example
    ```
 
-# Overview of Mock Files
-```javascript
-module.exports = [
-    {
-        path: '/api/example',
-        method: 'get',
-        response: {
-          key: 'hello world!'
-        }
-    },
-    {
-      // mock file here...
-    },
-];
-```
+## Overview of Mock Files
 
 | key        | type    | description                                          | Required                                                                  |
 |------------|---------|----------------------------------------------------- |---------------------------------------------------------------------------|
@@ -86,10 +75,33 @@ module.exports = [
 | query      | Object  | An object of key / value pairs for the querystring   | optional                                                                  |
 | response   | Object  | An object representing your desired response         | optional (but why wouldn't you include one?)                              |
 
+```javascript
+// Example File
+module.exports = [
+    {
+        path: '/api/example/paramName/:paramName/querystring',
+        method: 'post',
+        body: {
+            key: 'value'
+        },
+        params: {
+            paramName: 'value of param'
+        },
+        query: {
+            foo: 'bar'
+        },
+        response: {
+          key: 'hello world!'
+        }
+    },
+    {
+      // mock file here...
+    },
+];
+```
 
-# Adding Paths to Mocks
-
-##### Adding the same path multiple times
+## Adding Paths to Mocks
+##### Adding the same path multiple times #foo
 
 Mock files are entirely unopinionated. You can add different mocks for entirely different paths, if you so desire.
 You can also keep mock files on a one-basepath-to-file stategy. In this case, instead of writing out paths over and over,
@@ -147,3 +159,4 @@ of confusion when reading them.
         },
     ]);
 ```
+
