@@ -2,7 +2,6 @@ const { defaultPath } = require('../../MockingBird.js');
 
 module.exports = defaultPath('/api/helloworld/defaultpath', [
   {
-    method: 'get',
     statusCode: 200,
     waitTime: 0,
     response: {
@@ -10,8 +9,7 @@ module.exports = defaultPath('/api/helloworld/defaultpath', [
     }
   },
   {
-    path: '/api/helloworld/definedpath'
-    method: 'get',
+    path: '/api/helloworld/definedpath',
     statusCode: 200,
     waitTime: 0,
     response: {
