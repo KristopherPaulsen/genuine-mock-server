@@ -86,7 +86,8 @@ for storing your mocks.
             path: '/api/helloworld/simple',
             method: 'get',
             response: {
-            key: 'hello world!'
+              key: 'hello world!'
+            }
         }
     ];
 
