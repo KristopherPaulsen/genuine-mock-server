@@ -2,18 +2,22 @@ const glob = require('glob');
 const path = require('path');
 const bodyParser = require('body-parser');
 const express = require('express');
-const { get, flatten, defaults, sortBy, flow, keys, partial, _ } = require('lodash');
+const { get, flatten, defaultsDeep, sortBy, flow, keys, partial, _ } = require('lodash');
 const md5 = require('md5');
 
 const mockDefaults = {
-  path: '',
-  waitTime: 0,
-  statusCode: 200,
-  method: 'get',
-  body: {},
-  query: {},
-  params: {},
-  response: {}
+  req: {
+    path: '',
+    method: 'get',
+    body: {},
+    query: {},
+    params: {},
+  },
+  res: {
+    data: {},
+    waitTime: 0,
+    statusCode: 200,
+  }
 };
 
 const hashToColon = (path) => {
@@ -31,9 +35,11 @@ const getMocks = ({ mocks, pathToFiles, filePattern}) => {
     return mocks;
   }
 
-  return glob
+  return flatten(
+    glob
     .sync(path.resolve(`${pathToFiles}/**/${filePattern}`))
     .map(file => require(path.resolve(file)))
+  );
 };
 
 const toKey = (body, query, params) => (
@@ -47,31 +53,12 @@ const defaultPath = (path, rawMocks) => (
   }))
 );
 
-const toRequestMap = (rawMocks) => (
-  flatten(rawMocks).reduce((requestMap, rawMock) => {
-
-    const { path, body, query, params, method, ...restOfMock } = defaults(rawMock, mockDefaults);
-    const normalizedPath = hashToColon(path)
-
-    return {
-      ...requestMap,
-      [normalizedPath]: {
-        ...requestMap[normalizedPath],
-        [method]: {
-          ...get(requestMap, [normalizedPath, method], {}),
-          [toKey(body, query, params)]: restOfMock,
-        }
-      }
-    }
-  }, {})
-);
-
 const route = (
-  res, { statusCode, response, waitTime },
+  res, { statusCode, data, waitTime },
 ) => (
   setTimeout(() => (
     res.status(statusCode)
-       .send(response)
+       .send(data)
   ), waitTime)
 );
 
@@ -90,6 +77,26 @@ const startListening = (server, port) => (
   server.listen(port, () => console.log(`Listening on port: ${port}`))
 );
 
+const toMapy = (rawMocks) => (
+  rawMocks.reduce((requestMap, rawMock) => {
+
+    const { req, res }  = defaultsDeep(rawMock, mockDefaults);
+    const normalizedPath = hashToColon(req.path)
+
+    return {
+      ...requestMap,
+      [normalizedPath]: {
+        ...requestMap[normalizedPath],
+        [req.method]: {
+          ...get(requestMap, [normalizedPath, req.method], {}),
+          [toKey(req.body, req.query, req.params)]: res,
+        }
+      }
+    }
+  }, {})
+);
+
+
 const init = ({ port, filePattern, pathToFiles, mocks }) => {
   const mockServer = express();
 
@@ -107,7 +114,9 @@ const init = ({ port, filePattern, pathToFiles, mocks }) => {
   });
 
   flow(
-    toRequestMap,
+    (x) => { console.log(JSON.stringify( x , null, 2 )); return x},
+    toMapy,
+    (x) => { console.log(JSON.stringify( x , null, 2 )); return x},
     partial(registerRoutes, mockServer, _),
     partial(startListening, mockServer, port)
   )(getMocks({ filePattern, pathToFiles, mocks}));
@@ -115,8 +124,9 @@ const init = ({ port, filePattern, pathToFiles, mocks }) => {
 
 module.exports = {
   toKey,
-  toRequestMap,
+  toMapy,
   hashToColon,
   defaultPath,
   init,
 };
+
