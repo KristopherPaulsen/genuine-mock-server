@@ -204,6 +204,8 @@ describe('toRequestMap()', () => {
 
 describe('toKey()', () => {
 
+  //TODO TEST FOR DIFFERNT OBJECTS, VALUES IN REVERSE
+
   it('should convert different objects, with NO values, to "equal" strings', () => {
 
     const bodyOne = {};

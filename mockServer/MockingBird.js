@@ -4,16 +4,17 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const { get, flatten, defaultsDeep, sortBy, flow, keys, partial, _ } = require('lodash');
 const md5 = require('md5');
+const stringify  = require('json-stable-stringify')
 
 const mockDefaults = {
-  req: {
+  request: {
     path: '',
     method: 'get',
     body: {},
     query: {},
     params: {},
   },
-  res: {
+  response: {
     data: {},
     waitTime: 0,
     statusCode: 200,
@@ -43,7 +44,7 @@ const getMocks = ({ mocks, pathToFiles, filePattern}) => {
 };
 
 const toKey = (body, query, params) => (
-  [body, query, params].map(flow(JSON.stringify, sortBy, md5))
+  [body, query, params].map(flow(stringify, md5))
 );
 
 const defaultPath = (path, rawMocks) => (
@@ -80,7 +81,7 @@ const startListening = (server, port) => (
 const toMapy = (rawMocks) => (
   rawMocks.reduce((requestMap, rawMock) => {
 
-    const { req, res }  = defaultsDeep(rawMock, mockDefaults);
+    const { request: req, response: res }  = defaultsDeep(rawMock, mockDefaults);
     const normalizedPath = hashToColon(req.path)
 
     return {
@@ -114,9 +115,7 @@ const init = ({ port, filePattern, pathToFiles, mocks }) => {
   });
 
   flow(
-    (x) => { console.log(JSON.stringify( x , null, 2 )); return x},
     toMapy,
-    (x) => { console.log(JSON.stringify( x , null, 2 )); return x},
     partial(registerRoutes, mockServer, _),
     partial(startListening, mockServer, port)
   )(getMocks({ filePattern, pathToFiles, mocks}));

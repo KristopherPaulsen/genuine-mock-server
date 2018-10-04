@@ -1,11 +1,13 @@
 module.exports = [
   {
-    path: '/api/helloworld/simple',
-    method: 'get',
-    statusCode: 200,
-    waitTime: 0,
+    request: {
+      method: 'get',
+      path: '/api/helloworld/simple',
+    },
     response: {
-      "key": "Hello world!",
-    }
+      data: {
+        'key': 'Hello World!',
+      }
+    },
   },
 ];
