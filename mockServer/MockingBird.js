@@ -78,7 +78,7 @@ const startListening = (server, port) => (
   server.listen(port, () => console.log(`Listening on port: ${port}`))
 );
 
-const toMapy = (rawMocks) => (
+const toRequestMap = (rawMocks) => (
   rawMocks.reduce((requestMap, rawMock) => {
 
     const { request: req, response: res }  = defaultsDeep(rawMock, mockDefaults);
@@ -115,7 +115,7 @@ const init = ({ port, filePattern, pathToFiles, mocks }) => {
   });
 
   flow(
-    toMapy,
+    toRequestMap,
     partial(registerRoutes, mockServer, _),
     partial(startListening, mockServer, port)
   )(getMocks({ filePattern, pathToFiles, mocks}));
@@ -123,7 +123,7 @@ const init = ({ port, filePattern, pathToFiles, mocks }) => {
 
 module.exports = {
   toKey,
-  toMapy,
+  toRequestMap,
   hashToColon,
   defaultPath,
   init,

@@ -19,26 +19,32 @@ describe('toRequestMap()', () => {
           [toKey({}, {}, {})]: {
             waitTime: 0,
             statusCode: 200,
-            response: {}
+            data: {}
           },
         },
       },
     });
   });
 
-  it('should pre-flatten raw mocks while building map', () => {
+  it('should build simple map', () => {
     const rawMocks = [
-      [
-        {
-          path: "/api/example/param/:param",
+      {
+        request: {
+          path: '/api/example/param/:param',
           method: 'get',
-          statusCode: 200,
-          waitTime: 0,
-          response: {
-            key: "no params, no body, no query response",
-          }
+          body: {},
+          query: {},
+          params: {},
         },
-      ]
+        response: {
+          data: {},
+          waitTime: 0,
+          statusCode: 200,
+          data: {
+            "key": "no params, no body, no query response"
+          }
+        }
+      }
     ];
 
     expect(toRequestMap(rawMocks)).toEqual({
@@ -47,7 +53,7 @@ describe('toRequestMap()', () => {
           [toKey({}, {}, {})]: {
             "statusCode": 200,
             "waitTime": 0,
-            "response": {
+            "data": {
               "key": "no params, no body, no query response"
             }
           },
@@ -59,37 +65,49 @@ describe('toRequestMap()', () => {
   it('should convert all requests for the given path to a "request-map" with double in same method / path', () => {
     const rawMocks = [
       {
-        path: "/api/example",
-        method: 'get',
-        statusCode: 200,
-        waitTime: 0,
+        request: {
+          path: "/api/example",
+          method: 'get',
+        },
         response: {
-          key: "no params, no body, no query response",
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "no params, no body, no query response",
+          }
         }
       },
       {
-        path: "/api/example/param/:param",
-        method: 'get',
-        statusCode: 200,
-        waitTime: 0,
-        params: {
-          foo: 'bar',
-          baz: 'boop',
+        request: {
+          path: "/api/example/param/:param",
+          method: 'get',
+          params: {
+            foo: 'bar',
+            baz: 'boop',
+          },
         },
         response: {
-          key: "multi-param",
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "multi-param",
+          }
         }
       },
       {
-        path: "/api/example/param/:param",
-        method: 'get',
-        statusCode: 200,
-        waitTime: 0,
-        params: {
-          foo: 'bar'
+        request: {
+          path: "/api/example/param/:param",
+          method: 'get',
+          params: {
+            foo: 'bar'
+          },
         },
         response: {
-          key: "single param",
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "single param",
+          }
         }
       },
     ];
@@ -100,7 +118,7 @@ describe('toRequestMap()', () => {
           [toKey({}, {}, {})]: {
             "statusCode": 200,
             "waitTime": 0,
-            "response": {
+            "data": {
               "key": "no params, no body, no query response"
             }
           },
@@ -111,14 +129,14 @@ describe('toRequestMap()', () => {
           [toKey({}, {}, { foo: 'bar' })]: {
             "statusCode": 200,
             "waitTime": 0,
-            "response": {
+            "data": {
               "key": "single param"
             }
           },
           [toKey({}, {}, { foo: 'bar', baz: 'boop' })]: {
             "statusCode": 200,
             "waitTime": 0,
-            "response": {
+            "data": {
               "key": "multi-param"
             }
           },
@@ -130,38 +148,50 @@ describe('toRequestMap()', () => {
   it('should convert all requests for the given path to a "request-map" with multiple method types', () => {
     const rawMocks = [
       {
-        path: "/api/example",
-        method: 'get',
-        statusCode: 200,
-        waitTime: 0,
+        request: {
+          path: "/api/example",
+          method: 'get',
+        },
         response: {
-          key: "no params, no body, no query response",
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "no params, no body, no query response",
+          }
         }
       },
       {
-        path: "/api/example/param/:param",
-        method: 'get',
-        statusCode: 200,
-        waitTime: 0,
-        params: {
-          foo: 'bar',
-          baz: 'boop',
+        request: {
+          path: "/api/example/param/:param",
+          method: 'get',
+          params: {
+            foo: 'bar',
+            baz: 'boop',
+          },
         },
         response: {
-          key: "multi-param",
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "multi-param",
+          }
         }
       },
       {
-        path: "/api/example/param/:param",
-        method: 'delete',
-        statusCode: 200,
-        waitTime: 0,
-        params: {
-          foo: 'bar'
+        request: {
+          path: "/api/example/param/:param",
+          method: 'delete',
+          params: {
+            foo: 'bar'
+          },
         },
         response: {
-          key: "single param",
-        }
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "single param",
+          }
+        },
       },
     ];
 
@@ -171,7 +201,7 @@ describe('toRequestMap()', () => {
           [toKey({}, {}, {})]: {
             "statusCode": 200,
             "waitTime": 0,
-            "response": {
+            "data": {
               "key": "no params, no body, no query response"
             }
           },
@@ -182,7 +212,7 @@ describe('toRequestMap()', () => {
           [toKey({}, {}, { foo: 'bar', baz: 'boop' })]: {
             "statusCode": 200,
             "waitTime": 0,
-            "response": {
+            "data": {
               "key": "multi-param"
             }
           },
@@ -191,7 +221,7 @@ describe('toRequestMap()', () => {
           [toKey({}, {}, { foo: 'bar' })]: {
             "statusCode": 200,
             "waitTime": 0,
-            "response": {
+            "data": {
               "key": "single param"
             }
           },
