@@ -1,6 +1,6 @@
 const { defaultPath } = require('../../MockingBird.js');
 
-module.exports = [
+module.exports = defaultPath('/api/helloworld/defaultpath/', [
   {
     request: {
       method: 'get',
@@ -33,4 +33,4 @@ module.exports = [
       }
     },
   },
-];
+]);

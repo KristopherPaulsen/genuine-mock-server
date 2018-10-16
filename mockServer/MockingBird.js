@@ -48,9 +48,12 @@ const toKey = (body, query, params) => (
 );
 
 const defaultPath = (path, rawMocks) => (
-  rawMocks.map(mock => ({
-    ...mock,
-    ...(mock.path ? { [mock.path]: mock.path} : { path, }),
+  rawMocks.map(rawMock => ({
+      ...rawMock,
+      request: {
+        ...rawMock.request,
+        path: get(rawMock, 'request.path', path),
+      }
   }))
 );
 
@@ -81,16 +84,22 @@ const startListening = (server, port) => (
 const toRequestMap = (rawMocks) => (
   rawMocks.reduce((requestMap, rawMock) => {
 
-    const { request: req, response: res }  = defaultsDeep(rawMock, mockDefaults);
-    const normalizedPath = hashToColon(req.path)
+    const {
+      request: {
+        method, body, query, params, path, ...request
+      },
+      response
+    } = defaultsDeep(rawMock, mockDefaults);
+
+    const normalizedPath = hashToColon(path)
 
     return {
       ...requestMap,
       [normalizedPath]: {
         ...requestMap[normalizedPath],
-        [req.method]: {
-          ...get(requestMap, [normalizedPath, req.method], {}),
-          [toKey(req.body, req.query, req.params)]: res,
+        [method]: {
+          ...get(requestMap, [normalizedPath, method], {}),
+          [toKey(body, query, params)]: response,
         }
       }
     }
