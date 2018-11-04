@@ -2,7 +2,48 @@ const {
   toKey,
   toRequestMap,
   hashToColon,
+  getMockStrategy,
+  getCombinedMocks,
+  getSlurpedMocks,
+  getSuppliedMocks,
 } = require('../mockServer/MockingBird.js');
+
+describe('getMockStrategy()', () => {
+  it('returns getSlurpedMocks when no mocks are supplied, only a file path', () => {
+    const mockConfig = {
+      pathToFiles: '/fake/path/here'
+    };
+
+    const strategy = getMockStrategy(mockConfig);
+
+    expect(strategy).toBe(getSlurpedMocks);
+  });
+
+  it('returns getSuppliedMocks when no file path is included', () => {
+    const mockConfig = {
+      mocks: [
+        { value:'dummy values' }
+      ]
+    };
+
+    const strategy = getMockStrategy(mockConfig);
+
+    expect(strategy).toBe(getSuppliedMocks);
+  });
+
+  it('returns getCombinedMocks when a file path, and supplied mocks are given', () => {
+    const mockConfig = {
+      pathToFiles: '/fake/path/here',
+      mocks: [
+        { value:'dummy values' }
+      ]
+    };
+
+    const strategy = getMockStrategy(mockConfig);
+
+    expect(strategy).toBe(getCombinedMocks);
+  });
+});
 
 describe('toRequestMap()', () => {
 

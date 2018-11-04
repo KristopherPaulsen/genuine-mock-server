@@ -1,11 +1,8 @@
-//TODO Add unit tests for missing methods
-
 const glob = require('glob');
 const path = require('path');
 const bodyParser = require('body-parser');
 const express = require('express');
 const { get, flatten, defaultsDeep, sortBy, flow, keys, partial, _ } = require('lodash');
-const md5 = require('md5');
 const stringify  = require('json-stable-stringify')
 
 const mockDefaults = {
@@ -33,20 +30,35 @@ const hashToColon = (path) => {
   return `${paramPath.replace(/#/g, ':')}${queryPath}`;
 }
 
-const getMocks = ({ mocks, pathToFiles, filePattern}) => {
-  if (mocks) {
-    return mocks;
+const getMockStrategy = ({ mocks, pathToFiles}) => {
+  if (mocks && !pathToFiles) {
+    return getSuppliedMocks;
   }
 
-  return flatten(
+  if (!mocks && pathToFiles) {
+    return getSlurpedMocks;
+  }
+
+  return getCombinedMocks;
+}
+
+const getSuppliedMocks = (mocks) => mocks;
+
+const getSlurpedMocks = ({ pathToFiles, filePattern }) => (
+  flatten(
     glob
     .sync(path.resolve(`${pathToFiles}/**/${filePattern}`))
     .map(file => require(path.resolve(file)))
-  );
-};
+  )
+)
+
+const getCombinedMocks = ({ pathToFiles, filePattern, mocks }) => ([
+    ...mocks,
+    ...slurpMocks({ pathToFiles, filePattern, }),
+]);
 
 const toKey = (body, query, params) => (
-  [body, query, params].map(flow(stringify, md5))
+  [body, query, params].map(stringify)
 );
 
 const defaultPath = (path, rawMocks) => (
@@ -109,7 +121,7 @@ const toRequestMap = (rawMocks) => (
 );
 
 
-const init = ({ port, filePattern, pathToFiles, mocks }) => {
+const init = ({ port, ...mockConfig }) => {
   const mockServer = express();
 
   mockServer.use(bodyParser.json());
@@ -125,14 +137,20 @@ const init = ({ port, filePattern, pathToFiles, mocks }) => {
     next();
   });
 
+  const getMocks = getMockStrategy(mockConfig);
+
   flow(
     toRequestMap,
     partial(registerRoutes, mockServer, _),
     partial(startListening, mockServer, port)
-  )(getMocks({ filePattern, pathToFiles, mocks}));
+  )(getMocks(mockConfig));
 }
 
 module.exports = {
+  getMockStrategy,
+  getSuppliedMocks,
+  getCombinedMocks,
+  getSlurpedMocks,
   toKey,
   toRequestMap,
   hashToColon,
