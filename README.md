@@ -7,8 +7,9 @@
 
 * [An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
 * [Getting Started](#getting-started)
-* [Building the mock server using slurp mode](#building-the-mock-server-using-slurp-mode)
 * [Overview of Mock Files](#overview-of-mock-files)
+* [Overview of Initizalation Script](#overview-of-initialization-script)
+* [Building the mock server using slurp mode](#building-the-mock-server-using-slurp-mode)
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
 
 ## Getting Started
@@ -25,20 +26,22 @@
 
     const mocks = [
       {
-        path: '/api/helloworld/simple',
-        method: 'get',
-        statusCode: 200,
-        waitTime: 0,
+        request: {
+          method: 'get',
+          path: '/api/helloworld/simple',
+        },
         response: {
-          "key": "Hello world!",
-        }
+          data: {
+            'key': 'Hello World!',
+          }
+        },
       },
     ];
 
     init({
       port: 8080,
       mocks: mocks,
-    });
+    }
     ```
 
 2. Use your prefered script watcher (We recommend nodemon)
@@ -82,13 +85,17 @@ for storing your mocks.
 
     ```javascript
     module.exports = [
-        {
-            path: '/api/helloworld/simple',
-            method: 'get',
-            response: {
-              key: 'hello world!'
-            }
-        }
+      {
+        request: {
+          method: 'get',
+          path: '/api/helloworld/simple',
+        },
+        response: {
+          data: {
+            'key': 'Hello World!',
+          }
+        },
+      },
     ];
 
     ```
@@ -124,51 +131,71 @@ for storing your mocks.
 5. Curl that bad-boy!
 
    ```bash
-   curl http://localhost:8080/api/helloworld/example
+   curl http://localhost:8080/api/helloworld/simple
    ```
 
 </br>
 
 ## Overview of Mock Files
 
-| key        | type    | description                                          | Required                                                                  |
-|------------|---------|----------------------------------------------------- |---------------------------------------------------------------------------|
-| path       | string  | The endpoint base url                                | Required (but can be added in different ways, see 'adding paths to mocks' |
-| method     | string  | The lowercase http method                            | optional (defaults to 'get')                                              |
-| statusCode | Integer | The response code returned by server                 | optional (defaults to 200)                                                |
-| waitTime   | Integer | The wait time before the mock server responds        | optional (defaults to 0)                                                  |
-| params     | Object  | An object of key / value pairs for path params       | optional (key names should match param path names)                        |
-| body       | Object  | An object of key / value pairs for the body request  | optional                                                                  |
-| query      | Object  | An object of key / value pairs for the querystring   | optional                                                                  |
-| response   | Object  | An object representing your desired response         | optional (but why wouldn't you include one?)                              |
-
 ```javascript
-// Example File
-
 module.exports = [
-    {
-        path: '/api/example/someparam/:someparam/querystring',
-        method: 'post',
-        body: {
-            key: 'value'
-        },
-        params: {
-            someparam: 'baz'
-        },
-        query: {
-            foo: 'bar'
-        },
-        response: {
-          key: 'hello world!'
-        }
+  {
+    request: {
+      // ...
     },
-    {
-      // mock file here...
+    response: {
+      // ...
     },
-];
+  },
+]
 ```
 
+#### Request Blob
+
+| Key    | Type   | Description                                         | Required                   |
+|--------|--------|-----------------------------------------------------|----------------------------|
+| path   | String | The api endpoint path (not including querystring)   | required                   |
+| method | String | The http method                                     | optional (defaults to GET) |
+| params | Object | An object of key / value pairs for path params      | optional (defaults to {})  |
+| body   | Object | An object of key / value pairs for the body request | optional (defaults to {})  |
+| query  | Object | An object of key / value pairs for the querystring  | optional (defaults to {})  |
+
+#### Response Blob
+
+| Key        | Type    | Description                                                         | Required                                    |
+|------------|---------|---------------------------------------------------------------------|---------------------------------------------|
+| waitTime   | Integer | The time in milliseconds the mockserver will wait before responding | optional (defaults to 0)                    |
+| statusCode | Integer | The http status code in the response                                | optional (defaults to 200)                  |
+| data       | Object  | The data that will be returned in the response from the mock server | optional (by why would you leave it blank?) |
+
 </br>
+
+## Overview of initialization script
+
+```
+const { init } = require('./mockServer/MockingBird.js');
+
+init({
+  port: 8080,
+  pathToFiles: './mockServer/Mocks',
+  filePattern: '*.js', // whatever file extension you want to target
+  mocks: [
+    {
+      // ... stuff here
+    }
+  ]
+});
+
+```
+
+| Key         | Type    | Description                                                                                   | Required                                         |
+|-------------|---------|-----------------------------------------------------------------------------------------------|--------------------------------------------------|
+| port        | Integer | The port number for the mock server                                                           | required                                         |
+| pathToFiles | String  | The path to the top-level folder containing mock files                                        | required (only if 'mocks' is not included)       |
+| filePattern | String  | The file pattern / file extension to be slurped up by the mock server                         | optional                                         |
+| mocks       | Array   | An array of supplied mock objects. Useful if you want to supply programatically created mocks | required (only if 'pathToFiles' is not included) |
+
 
 ## Adding Paths to Mocks
 
@@ -206,26 +233,32 @@ method is included to make things easier, should you so desire.
 
 
 ```javascript
-const { defaultPath } = require('genuine-mock-server');
+const { defaultPath } = require('../../MockingBird.js');
 
-module.exports = defaultPath('/api/example', [
-    {
-        // path gets added by defaultPath helper method
-        method: 'get',
-        response: {
-          key: 'hello world!'
-        }
+module.exports = defaultPath('/api/helloworld/defaultpath/', [
+  {
+    request: {
+     // default path gets added automagically
+      method: 'get',
     },
-    {
-        // path gets added by defaultPath helper method
-        method: 'post',
-        body: {
-          key: 'value',
-        },
-        response: {
-          key: 'hello world!'
-        }
+    response: {
+      data: {
+        'key': 'I use the default path',
+      }
     },
+  },
+
+  {
+    request: {
+     // default path gets added automagically
+      method: 'delete',
+    },
+    response: {
+      data: {
+        'key': 'I use the default path as well!',
+      }
+    },
+  },
 ]);
 ```
 
@@ -239,33 +272,43 @@ paths you HAVE defined. See below for an example*
 You can, if you so desire, add the same path to all mock files, *except* for a few of them.
 
 ```javascript
-const { defaultPath } = require('genuine-mock-server');
+const { defaultPath } = require('../../MockingBird.js');
 
-module.exports = defaultPath('/api/example', [
-    {
-        // path gets added by defaultPath helper method
-        method: 'get',
-        response: {
-          key: 'hello world!'
-        }
+module.exports = defaultPath('/api/helloworld/defaultpath/', [
+  {
+    request: {
+     // default path gets added automagically
+      method: 'get',
     },
-    {
-        // path gets added by defaultPath helper method
-        method: 'get',
-        query: {
-          foo: 'bar',
-        },
-        response: {
-          key: 'hello world!'
-        }
+    response: {
+      data: {
+        'key': 'I use the default path',
+      }
     },
-    {
-        // path remains unchanged by helper method
-        path: '/api/alreadydefined/'
-        method: 'get',
-        response: {
-          key: 'hello world!'
-        }
+  },
+
+  {
+    request: {
+     // default path gets added automagically
+      method: 'delete',
     },
+    response: {
+      data: {
+        'key': 'I use the default path as well!',
+      }
+    },
+  },
+
+  {
+    request: {
+      path: '/api/helloworld/notdefaultpath' // Since the path is defined, it is NOT overriden
+      method: 'delete',
+    },
+    response: {
+      data: {
+        'key': 'My path was defined, so I wont be overriden',
+      }
+    },
+  },
 ]);
 ```
