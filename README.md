@@ -174,7 +174,7 @@ module.exports = [
 
 ## Overview of initialization script
 
-```
+```javascript
 const { init } = require('genuine-mock-server');
 
 init({
@@ -203,7 +203,7 @@ init({
 You can use both mock files defined inside a mock folder,
 or programatically added mock files, or both!
 
-```
+```javascript
 // only slurp mocks are added, since the other keys have been ommitted
 
 const { init } = require('genuine-mock-server');
@@ -218,7 +218,7 @@ init({
 <br>
 
 
-```
+```javascript
 // only provided mocks are added, since the other keys have been ommited
 
 const { init } = require('genuine-mock-server');
@@ -246,7 +246,7 @@ const { init } = require('genuine-mock-server');
 <br>
 
 
-```
+```javascript
 // Here, both provided mocks, AND slurped mocks are used
 
 const { init } = require('genuine-mock-server');
