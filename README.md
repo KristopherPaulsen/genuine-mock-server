@@ -11,6 +11,7 @@
 * [Overview of Initizalation Script](#overview-of-initialization-script)
 * [Building the mock server using slurp mode](#building-the-mock-server-using-slurp-mode)
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
+* [How, Query, Param and Body work in mock files](#how-query-param-and-body-work-in-mock-files)
 
 ## Getting Started
 1. Create a script to start your mock server at the git root of your project
@@ -391,3 +392,187 @@ module.exports = defaultPath('/api/helloworld/defaultpath/', [
   },
 ]);
 ```
+
+## How Query Param and Body work in mock files
+
+```javascript
+module.exports = [
+  {
+    request: {
+      query: {
+        // ...
+      },
+      body: {
+        // ...
+      },
+      params: {
+        // ...
+      }
+    },
+    response: {
+      // ...
+    },
+  },
+]
+```
+
+Genuine Mock server follows a simple strategy for mocking files. `Request` represents
+any given http request sent to the server, with a given set of paramaters. Any request
+that exactly matches these paramaters will return the data supplied in `response`.
+
+
+### Query Example
+
+Lets say you wanted to mock any GET request to `/api/helloworld/people?name=jimmy`.
+Your mock file would look like
+
+```javascript
+module.exports = [
+  {
+    request: {
+      path: '/api/helloworld/people'
+      query: {
+        name: 'jimmy', // A GET request to '/api/helloworld/people?name=jimmy', would match this request
+      },
+    },
+    response: {
+      data: {
+        someKey: "I am the get querystring example response!"
+      }
+    },
+  },
+]
+
+// Example semi-psuedocode axios
+
+axios.get('/api/helloworld/people?name=jimmy');
+
+// Example response
+
+{
+  someKey: "I am the get querystring example response!"
+}
+```
+
+### Path Example
+
+Lets say you wanted to mock any POST request to `/api/helloworld/person/:name`,
+where the `:name` is equal to 'jimmy'
+
+Your mock file would look like:
+
+```javascript
+module.exports = [
+  {
+    request: {
+      path: '/api/helloworld/person/:name'
+      path: {
+        name: 'jimmy', // A request to '/api/person/jimmy' would match this request!
+      },
+    },
+    response: {
+      data: {
+        someKey: "I am the path param example response!"
+      }
+    },
+  },
+]
+
+// Example semi-psuedocode axios
+
+axios.post('/api/helloworld/person/jimmy');
+
+// Example response
+
+{
+  someKey: "I am the path param example response!"
+}
+
+```
+
+### Body Example
+
+Lets say you wanted to mock a POST request to `/api/helloworld/people`,
+with a json body of `{ name: 'jimmy' }`
+
+Your mock file would look like
+
+```javascript
+module.exports = [
+  {
+    request: {
+      path: '/api/helloworld/person'
+      body: {
+        name: 'jimmy', // A POST request to the above path with the given body would match this request!
+      },
+    },
+    response: {
+      data: {
+          someKey: "I am the Body example response!"
+      }
+    },
+  },
+]
+
+// Example semi-psuedocode axios
+
+axios.post('/api/helloworld/person', {
+  name: 'jimmy',
+});
+
+// Example response
+
+{
+  someKey: "I am the body example response!"
+}
+```
+
+### Mixed Example
+
+Lets say you wanted to mock any POST request to `/api/helloworld/people/:name/filter?age=28`,
+with a path param of `{ name: 'jimmy' }`, and a json body of `{ occupation: 'teacher' }`
+
+Your mock file would look like:
+
+```javascript
+module.exports = [
+  {
+    request: {
+      path: '/api/helloworld/people/:name/filter',
+      query: {
+        age: '28',
+      },
+      params: {
+        name: 'jimmy'
+      },
+      body: {
+        occupation: 'teacher',
+      },
+    },
+    response: {
+      data: {
+        someKey: "I am the mixed request example data"
+      }
+    },
+  },
+]
+
+// Example semi-psuedocode axios
+
+axios.post('/api/helloworld/people/jimmy/filter?age=28', {
+  occupation: 'teacher',
+});
+
+// Example response
+
+{
+  someKey: "I am the mixed request example data"
+}
+```
+
+
+### Further Reading and Examples
+
+For more information on what the mock files look like with a mix of path params, querystrings, and request bodies,
+be sure to check out the example repo (Sometimes an example is worth a thousand words!)
+* [An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
