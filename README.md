@@ -174,7 +174,7 @@ module.exports = [
 ## Overview of initialization script
 
 ```
-const { init } = require('./mockServer/MockingBird.js');
+const { init } = require('genuine-mock-server');
 
 init({
   port: 8080,
@@ -186,7 +186,6 @@ init({
     }
   ]
 });
-
 ```
 
 | Key         | Type    | Description                                                                                   | Required                                         |
@@ -195,6 +194,86 @@ init({
 | pathToFiles | String  | The path to the top-level folder containing mock files                                        | required (only if 'mocks' is not included)       |
 | filePattern | String  | The file pattern / file extension to be slurped up by the mock server                         | optional                                         |
 | mocks       | Array   | An array of supplied mock objects. Useful if you want to supply programatically created mocks | required (only if 'pathToFiles' is not included) |
+
+<br>
+
+### Using mocks, slurped mocks, or both
+
+You can use both mock files defined inside a mock folder,
+or programatically added mock files, or both!
+
+```
+// only slurp mocks are added, since the other keys have been ommitted
+
+const { init } = require('genuine-mock-server');
+
+init({
+  port: 8080,
+  pathToFiles: './mocks',
+  filePattern: '*.js'
+});
+```
+
+<br>
+
+
+```
+// only provided mocks are added, since the other keys have been ommited
+
+const { init } = require('genuine-mock-server');
+
+    const mocks = [
+      {
+        request: {
+          method: 'get',
+          path: '/api/helloworld/simple',
+        },
+        response: {
+          data: {
+            'key': 'Hello World!',
+          }
+        },
+      },
+    ];
+
+    init({
+      port: 8080,
+      mocks: mocks,
+    });
+```
+
+<br>
+
+
+```
+// Here, both provided mocks, AND slurped mocks are used
+
+const { init } = require('genuine-mock-server');
+
+    const mocks = [
+      {
+        request: {
+          method: 'get',
+          path: '/api/helloworld/simple',
+        },
+        response: {
+          data: {
+            'key': 'Hello World!',
+          }
+        },
+      },
+    ];
+
+    init({
+      port: 8080,
+      mocks: mocks,
+      pathToFiles: './mockServer/Mocks',
+      filePattern: '*.js', // whatever file extension you want to target
+    });
+```
+
+*Note: Whichever method you choose is up to you. Provided
+mocks are added first, then slurped mocks.
 
 
 ## Adding Paths to Mocks
@@ -233,7 +312,7 @@ method is included to make things easier, should you so desire.
 
 
 ```javascript
-const { defaultPath } = require('../../MockingBird.js');
+const { defaultPath } = require('genuine-mock-server');
 
 module.exports = defaultPath('/api/helloworld/defaultpath/', [
   {
@@ -272,7 +351,7 @@ paths you HAVE defined. See below for an example*
 You can, if you so desire, add the same path to all mock files, *except* for a few of them.
 
 ```javascript
-const { defaultPath } = require('../../MockingBird.js');
+const { defaultPath } = require('genuine-mock-server');
 
 module.exports = defaultPath('/api/helloworld/defaultpath/', [
   {
