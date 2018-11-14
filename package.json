@@ -1,6 +1,6 @@
 {
   "name": "genuine-mock-server",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A real fake mock server for http requests",
   "main": "index.js",
   "directories": {
