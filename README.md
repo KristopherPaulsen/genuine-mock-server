@@ -283,25 +283,33 @@ mocks are added first, then slurped mocks.
 ### One Array of Mocks for Different Endpoints
 
 If you want, you can simply write out different paths by hand in each mock blob.
-The ability to specificy different paths on a per-mock basis is useful if you're
+The ability to specify different paths on a per-mock basis is useful if you're
 building out mocks programatically, and want complete control.
 
 ```javascript
 module.exports = [
-    {
-        path: '/api/path',
-        method: 'get',
-        response: {
-          key: 'hello world!'
-        }
+  {
+    request: {
+      method: 'get',
+      path: '/api/helloworld/firstpath',
     },
-    {
-        path: '/api/differentpath/',
-        method: 'get',
-        response: {
-          key: 'hello world!'
-        }
+    response: {
+      data: {
+        'key': 'Hello World!',
+      }
     },
+  }
+  {
+    request: {
+      method: 'get',
+      path: '/api/helloworld/secondpath',
+    },
+    response: {
+      data: {
+        'key': 'Hello World!',
+      }
+    },
+  }
 ];
 ```
 
