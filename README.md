@@ -12,7 +12,7 @@
 * [Building the mock server using slurp mode](#building-the-mock-server-using-slurp-mode)
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
 * [How, Query, Param and Body work in mock files](#how-query-param-and-body-work-in-mock-files)
-* [Gotchas And FAQ](#Gotchas and FAQ)
+* [Gotchas And FAQ](#gotchas-and-faqs)
 
 ## Getting Started
 1. Create a script to start your mock server at the git root of your project
@@ -433,7 +433,6 @@ that exactly matches these paramaters will return the data supplied in `response
 ### Query Example
 
 Lets say you wanted to mock any GET request to `/api/helloworld/people?name=jimmy`.
-Your mock file would look like
 
 ```javascript
 module.exports = [
@@ -467,8 +466,6 @@ axios.get('/api/helloworld/people?name=jimmy');
 
 Lets say you wanted to mock any POST request to `/api/helloworld/person/:name`,
 where the `:name` is equal to 'jimmy'
-
-Your mock file would look like:
 
 ```javascript
 module.exports = [
@@ -504,8 +501,6 @@ axios.post('/api/helloworld/person/jimmy');
 Lets say you wanted to mock a POST request to `/api/helloworld/people`,
 with a json body of `{ name: 'jimmy' }`
 
-Your mock file would look like
-
 ```javascript
 module.exports = [
   {
@@ -540,8 +535,6 @@ axios.post('/api/helloworld/person', {
 
 Lets say you wanted to mock any POST request to `/api/helloworld/people/:name/filter?age=28`,
 with a path param of `{ name: 'jimmy' }`, and a json body of `{ occupation: 'teacher' }`
-
-Your mock file would look like:
 
 ```javascript
 module.exports = [
