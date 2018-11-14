@@ -12,6 +12,7 @@
 * [Building the mock server using slurp mode](#building-the-mock-server-using-slurp-mode)
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
 * [How, Query, Param and Body work in mock files](#how-query-param-and-body-work-in-mock-files)
+* [Gotchas And FAQ](#Gotchas and FAQ)
 
 ## Getting Started
 1. Create a script to start your mock server at the git root of your project
@@ -251,26 +252,26 @@ const { init } = require('genuine-mock-server');
 
 const { init } = require('genuine-mock-server');
 
-    const mocks = [
-      {
-        request: {
-          method: 'get',
-          path: '/api/helloworld/simple',
-        },
-        response: {
-          data: {
-            'key': 'Hello World!',
-          }
-        },
-      },
-    ];
+const mocks = [
+  {
+    request: {
+      method: 'get',
+      path: '/api/helloworld/simple',
+    },
+    response: {
+      data: {
+        'key': 'Hello World!',
+      }
+    },
+  },
+];
 
-    init({
-      port: 8080,
-      mocks: mocks,
-      pathToFiles: './mockServer/Mocks',
-      filePattern: '*.js', // whatever file extension you want to target
-    });
+init({
+  port: 8080,
+  mocks: mocks,
+  pathToFiles: './mockServer/Mocks',
+  filePattern: '*.js', // whatever file extension you want to target
+});
 ```
 
 *Note: Whichever method you choose is up to you. Provided
@@ -576,3 +577,47 @@ axios.post('/api/helloworld/people/jimmy/filter?age=28', {
 For more information on what the mock files look like with a mix of path params, querystrings, and request bodies,
 be sure to check out the example repo (Sometimes an example is worth a thousand words!)
 * [An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
+
+## Gotchas and FAQs
+
+### Query String values ... they're ALWAYS strings...
+
+When you create a mock file involving query / querystrings, be aware that values should
+ALWAYS be strings. This is due in part to the HTTP spec, which uses strings under-the-hood,
+and express itself, which parses querystring values into key value pairs (with values being strings)
+
+[Further reading on the subject and implementation from Node / Express](https://nodejs.org/api/querystring.html)
+
+```javascript
+// inside your mock file
+
+//GOOD!
+
+module.exports = [
+  {
+    request: {
+      path: '/api/helloworld/filter?age=28',
+      query: {
+        age: '28', // Good, you're mock value is a string
+      },
+    },
+    response: {
+      // ...
+    }
+]
+
+//BAD!
+
+module.exports = [
+  {
+    request: {
+      path: '/api/helloworld/filter?age=28',
+      query: {
+        age: 28, // BAD!!! This will not match, the server will recieve 28 as a string
+      },
+    },
+    response: {
+      // ...
+    }
+]
+```
