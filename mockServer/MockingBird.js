@@ -116,8 +116,7 @@ const routeByMatch = (mocks, res, { body, query, params }) => {
 
 const registerRoutes = (server, pathMockMap) => (
   keys(pathMockMap).forEach(path => {
-    const mocks = pathMockMap[path];
-    mocks.forEach(mock => {
+    pathMockMap[path].forEach((mock, __, mocks) => {
       server[mock.request.method](mock.request.path, ({ body, query, params } , res) => {
         routeByMatch(mocks, res, { body, query, params })
       });
