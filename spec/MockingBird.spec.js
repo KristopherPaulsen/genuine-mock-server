@@ -3,13 +3,165 @@ const {
   getMockStrategy,
   normalizeMocks,
   areEqual,
+  toPathMockMap,
   getCombinedMocks,
   getSlurpedMocks,
   getSuppliedMocks,
 } = require('../mockServer/MockingBird.js');
 
 // test for areEqual
+// test for toPathMockMap,
 
+describe('toPathMockMap()', () => {
+
+  it('should build simple map', () => {
+    const rawMocks = [
+      {
+        request: {
+          path: '/api/example/param/:param',
+          method: 'get',
+          body: {},
+          query: {},
+          params: {},
+        },
+        response: {
+          data: {},
+          waitTime: 0,
+          statusCode: 200,
+          data: {
+            "key": "no params, no body, no query response"
+          }
+        }
+      }
+    ];
+
+    expect(toPathMockMap(rawMocks)).toEqual({
+      "/api/example/param/:param": [
+        {
+          request: {
+            path: '/api/example/param/:param',
+            method: 'get',
+            body: {},
+            query: {},
+            params: {},
+          },
+          response: {
+            data: {},
+            waitTime: 0,
+            statusCode: 200,
+            data: {
+              "key": "no params, no body, no query response"
+            }
+          }
+        }
+      ]
+    });
+  });
+
+  it('should convert all requests for the given path to a "request-map" with double in same method / path', () => {
+    const rawMocks = [
+      {
+        request: {
+          path: "/api/example",
+          method: 'get',
+        },
+        response: {
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "no params, no body, no query response",
+          }
+        }
+      },
+      {
+        request: {
+          path: "/api/example/param/:param",
+          method: 'get',
+          params: {
+            foo: 'bar',
+            baz: 'boop',
+          },
+        },
+        response: {
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "multi-param",
+          }
+        }
+      },
+      {
+        request: {
+          path: "/api/example/param/:param",
+          method: 'get',
+          params: {
+            foo: 'bar'
+          },
+        },
+        response: {
+          statusCode: 200,
+          waitTime: 0,
+          data: {
+            key: "single param",
+          }
+        }
+      },
+    ];
+
+    expect(toPathMockMap(rawMocks)).toEqual({
+      "/api/example": [
+        {
+          request: {
+            path: "/api/example",
+            method: 'get',
+          },
+          response: {
+            statusCode: 200,
+            waitTime: 0,
+            data: {
+              key: "no params, no body, no query response",
+            }
+          }
+        },
+      ],
+      "/api/example/param/:param": [
+        {
+          request: {
+            path: "/api/example/param/:param",
+            method: 'get',
+            params: {
+              foo: 'bar',
+              baz: 'boop',
+            },
+          },
+          response: {
+            statusCode: 200,
+            waitTime: 0,
+            data: {
+              key: "multi-param",
+            }
+          }
+        },
+        {
+          request: {
+            path: "/api/example/param/:param",
+            method: 'get',
+            params: {
+              foo: 'bar'
+            },
+          },
+          response: {
+            statusCode: 200,
+            waitTime: 0,
+            data: {
+              key: "single param",
+            }
+          }
+        }
+      ]
+    });
+  });
+});
 
 describe('areEqual()', () => {
   it('returns true when exact match', () => {

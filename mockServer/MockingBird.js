@@ -178,6 +178,7 @@ const init = ({ port, ...mockConfig }) => {
 module.exports = {
   areEqual,
   normalizeMocks,
+  toPathMockMap,
   getMockStrategy,
   getSuppliedMocks,
   getCombinedMocks,
