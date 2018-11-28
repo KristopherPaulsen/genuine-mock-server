@@ -5,7 +5,7 @@ const Ajv = require('ajv');
 const express = require('express');
 const {
   isEqual, get, flatten, defaultsDeep,
-  sortBy, flow, keys, partial, _
+  sortBy, every, flow, keys, partial, _
 } = require('lodash');
 
 const requestDefaults = {

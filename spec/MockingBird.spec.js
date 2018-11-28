@@ -196,6 +196,42 @@ describe('areEqual()', () => {
 
     expect(result).toBe(false);
   });
+
+  it('returns true when matches based on schema', () => {
+    expect(areEqual({
+      matchType: 'schema',
+      expected: {
+        body: {
+          const: {
+            key: 'value',
+          }
+        }
+      },
+      recieved: {
+        body: {
+          key: 'value',
+        }
+      }
+    })).toBe(true);
+  });
+
+  it('returns false when it doesnt match based on schema', () => {
+    expect(areEqual({
+      matchType: 'schema',
+      expected: {
+        body: {
+          const: {
+            key: '/value',
+          }
+        }
+      },
+      recieved: {
+        body: {
+          key: 'value',
+        }
+      }
+    })).toBe(false);
+  });
 });
 
 describe('normalizeMocks()', () => {
