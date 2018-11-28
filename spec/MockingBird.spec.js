@@ -9,9 +9,6 @@ const {
   getSuppliedMocks,
 } = require('../mockServer/MockingBird.js');
 
-// test for areEqual
-// test for toPathMockMap,
-
 describe('toPathMockMap()', () => {
 
   it('should build simple map', () => {
