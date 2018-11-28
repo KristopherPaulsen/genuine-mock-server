@@ -70,6 +70,16 @@ const normalizeMocks = (mocks) => (
   }))
 );
 
+const toPathMockMap = (mocks) => (
+  mocks.reduce((pathMockMap, mock) => ({
+    ...pathMockMap,
+    [mock.request.path]: [
+      ...get(pathMockMap, mock.request.path, []),
+      mock,
+    ]
+  }), {})
+);
+
 const defaultPath = (path, rawMocks) => (
   rawMocks.map(rawMock => ({
       ...rawMock,
@@ -80,33 +90,37 @@ const defaultPath = (path, rawMocks) => (
   }))
 );
 
-const route = (
-  res, { statusCode, data, waitTime },
-) => (
+const routeByMatch = (mocks, res, { body, query, params }) => {
+
+  const {
+    response: { data, statusCode, waitTime }
+  } = mocks.find(mock => areEqual({
+    matchType: mock.request.matchType,
+    expected: {
+      body: mock.request.body,
+      query: mock.request.query,
+      params: mock.request.params,
+    },
+    recieved: {
+      body,
+      query,
+      params
+    }
+  }));
+
   setTimeout(() => (
     res.status(statusCode)
        .send(data)
-  ), waitTime)
-);
+  ), waitTime);
+};
 
-const registerRoutes = (server, mocks) => (
-  mocks.forEach(mock => {
-    server[mock.request.method](mock.request.path, ({ body, query, params } , res) => {
-      const bestMatch = mocks.find(mock => areEqual({
-        matchType: mock.request.matchType,
-        expected: {
-          body: mock.request.body,
-          query: mock.request.query,
-          params: mock.request.params,
-        },
-        recieved: {
-          body,
-          query,
-          params
-        }
-      }));
-
-      route(res, bestMatch.response);
+const registerRoutes = (server, pathMockMap) => (
+  keys(pathMockMap).forEach(path => {
+    const mocks = pathMockMap[path];
+    mocks.forEach(mock => {
+      server[mock.request.method](mock.request.path, ({ body, query, params } , res) => {
+        routeByMatch(mocks, res, { body, query, params })
+      });
     })
   })
 );
@@ -114,7 +128,7 @@ const registerRoutes = (server, mocks) => (
 const areEqual = ({ matchType, expected, recieved }) => {
   if (matchType === 'exact') {
     return isEqual(
-      [expected.body, expected.query, expected.params]
+      [expected.body, expected.query, expected.params],
       [recieved.body, recieved.query, recieved.params]
     );
   }
@@ -156,6 +170,7 @@ const init = ({ port, ...mockConfig }) => {
 
   flow(
     normalizeMocks,
+    toPathMockMap,
     partial(registerRoutes, mockServer, _),
     partial(startListening, mockServer, port)
   )(getMocks(mockConfig));

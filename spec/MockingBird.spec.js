@@ -9,25 +9,48 @@ const {
 } = require('../mockServer/MockingBird.js');
 
 // test for areEqual
-// normalizeMocks
 
+
+describe('areEqual()', () => {
+  it('returns true when exact match', () => {
+    const result = areEqual({
+      matchType: 'exact',
+      expected: {
+        body: {
+          key: 'value',
+        }
+      },
+      recieved: {
+        body: {
+          key: 'value',
+        }
+      }
+    });
+
+    expect(result).toBe(true);
+  });
+
+  it('returns false when NOT exact match', () => {
+    const result = areEqual({
+      matchType: 'exact',
+      expected: {
+        body: {
+          key: 'value',
+        }
+      },
+      recieved: {
+        body: {
+          key: 'wrong value',
+        }
+      }
+    });
+
+    expect(result).toBe(false);
+  });
+});
 
 describe('normalizeMocks()', () => {
   it('returns mocks with hashes replaced with :, and default values', () => {
-
-    const result = normalizeMocks([
-      {
-        request: {
-          path: '/api/helloworld/name/#name',
-          method: 'get'
-        },
-        response: {
-          data: {
-            'key': 'uri hello world!'
-          }
-        }
-      }
-    ]);
 
     const expected = [
       {
@@ -48,6 +71,21 @@ describe('normalizeMocks()', () => {
         }
       }
     ];
+
+
+    const result = normalizeMocks([
+      {
+        request: {
+          path: '/api/helloworld/name/#name',
+          method: 'get'
+        },
+        response: {
+          data: {
+            'key': 'uri hello world!'
+          }
+        }
+      }
+    ]);
 
     expect(result).toEqual(expected);
   });
