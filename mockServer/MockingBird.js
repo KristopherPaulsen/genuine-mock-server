@@ -30,6 +30,8 @@ const hashToColon = (path) => {
   return `${paramPath.replace(/#/g, ':')}${queryPath}`;
 }
 
+const getSuppliedMocks = ({ mocks }) => mocks;
+
 const getMockStrategy = ({ mocks, pathToFiles}) => {
   if (mocks && !pathToFiles) {
     return getSuppliedMocks;
@@ -41,8 +43,6 @@ const getMockStrategy = ({ mocks, pathToFiles}) => {
 
   return getCombinedMocks;
 }
-
-const getSuppliedMocks = (mocks) => mocks;
 
 const getSlurpedMocks = ({ pathToFiles, filePattern }) => (
   flatten(
