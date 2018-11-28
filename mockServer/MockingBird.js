@@ -54,7 +54,7 @@ const getSlurpedMocks = ({ pathToFiles, filePattern }) => (
 
 const getCombinedMocks = ({ pathToFiles, filePattern, mocks }) => ([
     ...mocks,
-    ...slurpMocks({ pathToFiles, filePattern, }),
+    ...getSlurpedMocks({ pathToFiles, filePattern, }),
 ]);
 
 const toKey = (body, query, params) => (
