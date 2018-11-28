@@ -9,6 +9,10 @@ const {
   getSuppliedMocks,
 } = require('../mockServer/MockingBird.js');
 
+// hashToColon
+// regexes
+// globs from express
+
 describe('toPathMockMap()', () => {
 
   it('should build simple map', () => {
@@ -391,6 +395,10 @@ describe('getMockStrategy()', () => {
 describe('hashToColon()', () => {
   it('should replace hash with colon in simple path', () => {
     expect(hashToColon('/api/param/#param')).toEqual('/api/param/:param');
+  });
+
+  it('should replace hash with colon in route but not string pattern', () => {
+    expect(hashToColon('/api/param/#param?+*/rest/of/path')).toEqual('/api/param/:param?+*/rest/of/path');
   });
 
   it('should replace multiples hashes with colons in simple path', () => {
