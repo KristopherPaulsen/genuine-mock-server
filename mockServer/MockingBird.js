@@ -1,23 +1,26 @@
 const glob = require('glob');
 const path = require('path');
 const bodyParser = require('body-parser');
+const Ajv = require('ajv');
 const express = require('express');
-const { get, flatten, defaultsDeep, sortBy, flow, keys, partial, _ } = require('lodash');
-const stringify  = require('json-stable-stringify')
+const {
+  isEqual, get, flatten, defaultsDeep,
+  sortBy, flow, keys, partial, _
+} = require('lodash');
 
-const mockDefaults = {
-  request: {
-    path: '',
-    method: 'get',
-    body: {},
-    query: {},
-    params: {},
-  },
-  response: {
+const requestDefaults = {
+  path: '',
+  method: 'get',
+  body: {},
+  query: {},
+  params: {},
+  matchType: 'exact',
+};
+
+const responseDefaults = {
     data: {},
     waitTime: 0,
     statusCode: 200,
-  }
 };
 
 const hashToColon = (path) => {
@@ -42,7 +45,7 @@ const getMockStrategy = ({ mocks, pathToFiles}) => {
   return getCombinedMocks;
 }
 
-const getSuppliedMocks = (mocks) => mocks;
+const getSuppliedMocks = ({ mocks }) => mocks;
 
 const getSlurpedMocks = ({ pathToFiles, filePattern }) => (
   flatten(
@@ -54,11 +57,17 @@ const getSlurpedMocks = ({ pathToFiles, filePattern }) => (
 
 const getCombinedMocks = ({ pathToFiles, filePattern, mocks }) => ([
     ...mocks,
-    ...slurpMocks({ pathToFiles, filePattern, }),
+    ...getSlurpedMocks({ pathToFiles, filePattern, }),
 ]);
 
-const toKey = (body, query, params) => (
-  [body, query, params].map(stringify)
+const normalizeMocks = (mocks) => (
+  mocks.map(({ request, response }) => ({
+    request: {
+      ...defaultsDeep(request, requestDefaults),
+      path: hashToColon(request.path),
+    },
+    response: defaultsDeep(response, responseDefaults),
+  }))
 );
 
 const defaultPath = (path, rawMocks) => (
@@ -80,46 +89,52 @@ const route = (
   ), waitTime)
 );
 
-const registerRoutes = (server, mockMap) => (
-  keys(mockMap).forEach(path => {
-    keys(mockMap[path]).forEach(method => {
-      server[method](path, ({ body, query, params }, res) => {
-        const reqKey = toKey(body, query, params);
-        route(res, mockMap[path][method][reqKey]);
-      });
+const registerRoutes = (server, mocks) => (
+  mocks.forEach(mock => {
+    server[mock.request.method](mock.request.path, ({ body, query, params } , res) => {
+      const bestMatch = mocks.find(mock => areEqual({
+        matchType: mock.request.matchType,
+        expected: {
+          body: mock.request.body,
+          query: mock.request.query,
+          params: mock.request.params,
+        },
+        recieved: {
+          body,
+          query,
+          params
+        }
+      }));
+
+      route(res, bestMatch.response);
     })
   })
-)
+);
+
+const areEqual = ({ matchType, expected, recieved }) => {
+  if (matchType === 'exact') {
+    return isEqual(
+      [expected.body, expected.query, expected.params]
+      [recieved.body, recieved.query, recieved.params]
+    );
+  }
+
+  return every(keys(expected), key => {
+    return matchesSchema(expected[key], recieved[key]);
+  });
+};
+
+const matchesSchema = (schema, recieved) => {
+  var ajv      = new Ajv({allErrors: true});
+  var validate = ajv.compile(schema);
+  var isValid  = validate(recieved);
+
+  return Boolean(isValid);
+}
 
 const startListening = (server, port) => (
   server.listen(port, () => console.log(`Listening on port: ${port}`))
 );
-
-const toRequestMap = (rawMocks) => (
-  rawMocks.reduce((requestMap, rawMock) => {
-
-    const {
-      request: {
-        method, body, query, params, path, ...request
-      },
-      response
-    } = defaultsDeep(rawMock, mockDefaults);
-
-    const normalizedPath = hashToColon(path)
-
-    return {
-      ...requestMap,
-      [normalizedPath]: {
-        ...requestMap[normalizedPath],
-        [method]: {
-          ...get(requestMap, [normalizedPath, method], {}),
-          [toKey(body, query, params)]: response,
-        }
-      }
-    }
-  }, {})
-);
-
 
 const init = ({ port, ...mockConfig }) => {
   const mockServer = express();
@@ -140,21 +155,20 @@ const init = ({ port, ...mockConfig }) => {
   const getMocks = getMockStrategy(mockConfig);
 
   flow(
-    toRequestMap,
+    normalizeMocks,
     partial(registerRoutes, mockServer, _),
     partial(startListening, mockServer, port)
   )(getMocks(mockConfig));
 }
 
 module.exports = {
+  areEqual,
+  normalizeMocks,
   getMockStrategy,
   getSuppliedMocks,
   getCombinedMocks,
   getSlurpedMocks,
-  toKey,
-  toRequestMap,
   hashToColon,
   defaultPath,
   init,
 };
-

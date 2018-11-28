@@ -3,6 +3,7 @@ module.exports = [
     request: {
       method: 'get',
       path: '/api/helloworld/manyendpoints/first',
+      matchType: 'schema',
     },
     response: {
       data: {
