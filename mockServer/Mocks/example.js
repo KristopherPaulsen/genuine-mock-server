@@ -1,8 +1,8 @@
 module.exports = [
   {
     request: {
-      method: 'get',
-      path: '/api/helloworld/simple',
+      method: 'post',
+      path: '/api/helloworld',
     },
     response: {
       data: {

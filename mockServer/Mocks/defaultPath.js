@@ -1,4 +1,4 @@
-const { defaultPath } = require('../../MockingBird.js');
+const { defaultPath } = require('genuine-mock-server');
 
 module.exports = defaultPath('/api/helloworld/defaultpath/', [
   {
@@ -26,6 +26,7 @@ module.exports = defaultPath('/api/helloworld/defaultpath/', [
   {
     request: {
       method: 'delete',
+      path: '/api/helloworld/alreadydefined/'
     },
     response: {
       data: {
