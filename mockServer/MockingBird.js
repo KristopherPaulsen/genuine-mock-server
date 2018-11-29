@@ -77,54 +77,56 @@ const defaultPath = (path, rawMocks) => (
   }))
 );
 
-const routeByMatch = (mocks, res, { body, query, params }) => {
+const routeByMatch = (mocks, res, actualRequest) => {
 
-  const {
-    response: { data, statusCode, waitTime }
-  } = mocks.find(mock => areEqual({
+  const bestMatch = mocks.find(mock => areEqual({
     matchType: mock.request.matchType,
-    expected: {
-      schema: mock.request.schema,
-      body: mock.request.body,
-      query: mock.request.query,
-      params: mock.request.params,
-    },
-    recieved: {
-      body,
-      query,
-      params,
-    }
+    expected: mock.request,
+    recieved: actualRequest
   }));
 
   setTimeout(() => (
-    res.status(statusCode)
-       .send(data)
-  ), waitTime);
+    res.status(bestMatch.response.statusCode)
+       .send(bestMatch.response.data)
+  ), bestMatch.response.waitTime);
 };
 
 const registerRoutes = (server, pathMockMap) => (
   keys(pathMockMap).forEach(path => {
     pathMockMap[path].forEach((mock, __, mocks) => {
-      server[mock.request.method](mock.request.path, ({ body, query, params } , res) => {
-        routeByMatch(mocks, res, { body, query, params })
+      server[mock.request.method](mock.request.path, (req, res) => {
+        routeByMatch(mocks, res, req)
       });
     })
   })
 );
 
 const areEqual = ({
-  matchType,
-  expected: { schema, ...bodyQueryParams },
-  recieved
+  matchType, expected, recieved,
 }) => {
   if (matchType === 'exact') {
     return isEqual(
-      bodyQueryParams,
-      recieved,
+      {
+        body: expected.body,
+        query: expected.query,
+        params: expected.params
+      },
+      {
+        body: recieved.body,
+        query: recieved.query,
+        params: recieved.params,
+      }
     );
   }
 
-  return matchesSchema(schema, recieved);
+  return matchesSchema(
+    expected.schema,
+    {
+      body: recieved.body,
+      query: recieved.query,
+      params: recieved.params,
+    }
+  );
 };
 
 const matchesSchema = (schema, recieved) => {
