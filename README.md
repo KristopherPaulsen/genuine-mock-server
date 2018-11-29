@@ -13,6 +13,7 @@
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
 * [Adding Regex and String Pattern Paths to your Mocks](#adding-regex-and-string-pattern-paths-to-your-mocks)
 * [How, Query, Param and Body work in mock files](#how-query-param-and-body-work-in-mock-files)
+* [Subset and Structural Matching with JSON Schema](#subset-and-structural-matching-with-json-schema)
 * [Gotchas And FAQ](#gotchas-and-faqs)
 
 ## Getting Started
@@ -614,6 +615,73 @@ For more information on what the mock files look like with a mix of path params,
 be sure to check out the example repo (Sometimes an example is worth a thousand words!)
 * [An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
 
+## Subset and Structural Matching with JSON Schema
+`genuine-mock-server` also alows for mapping mocks-to-requests using `Json Schema`
+<br>
+<br>
+[JSON Schema Standard](#https://json-schema.org/)
+<br>
+[JSON Schema Node Package](#https://github.com/epoberezkin/ajv)
+
+This means you can match requests based on generalized subset descriptions of
+the incoming data, instead of EXACT matches [as used by default](#how-query-param-and-body-work-in-mock-files)
+
+```javascript
+module.exports = [
+  {
+    request: {
+      path: '/api/helloworld/schema',
+      query: {
+        age: '28',
+      },
+    },
+    response: {
+      data: {
+        someKey: "I am the example data"
+      }
+    },
+  },
+]
+
+// 1. Example semi-psuedocode axios
+
+axios.get('/api/helloworld/schema?somekey=valuehere');
+
+// 2. Mock server compares predescribed schema, to incoming request using JSON schema
+
+{
+  required: ['query'],
+  properties: {
+    query: {
+      properties: {
+        somekey: {
+          type: 'string',
+          const: 'valuehere'
+        }
+      }
+    }
+  }
+}
+
+// compared against ALL recieved request data
+
+{
+  query: {
+    somekey: 'valuehere'
+  },
+  body: {},
+  params: {},
+}
+
+// 3. Example response if it matches
+
+{
+  someKey: "I am the example data"
+}
+
+// 4. Otherwise, mock server keeps itterating
+```
+
 ## Gotchas and FAQs
 
 ### Query String values ... they're ALWAYS strings...
@@ -656,4 +724,71 @@ module.exports = [
       // ...
     }
 ]
+```
+
+### Exact Matches for mocking
+If you're using the default mock matching (i.e exact matching);
+```javascript
+{
+  request: {
+    // ...
+    matchType: 'exact' // Genuine-mock-server assumes this matchtype by default
+  },
+  response: {
+    // ...
+  }
+}
+```
+
+you need to be sure you're meeting all the data requirements, no more, no less.
+
+* If you're supply a *subset* of the data, your mock *will not* be matched
+* If you supply a superset of the data, your mock *will not* be matched
+
+```javascript
+// Example of a potential problem below
+
+const mocks = [
+  {
+    request: {
+      method: 'get',
+      path: '/api/helloworld/mismatch',
+    },
+    response: {
+      data: {
+        'key': 'If you include MORE data, I wont be matched',
+      }
+    },
+  },
+];
+
+// 1. Example semi-psuedocode axios
+
+axios.get('/api/helloworld/mismatch?extra=data');
+
+// 2. The mock server recieves a `get` request for '/api/helloworld/mismatch',
+//    with query data...
+
+query: {
+  extra: 'data'
+}
+
+//    Your mocked WILL NOT be matched, since your mock declares `query` have no data
+
+{
+  request: {
+    method: 'get',
+    path: '/api/helloworld/mismatch',
+    // <------------ No query data provided, considered empty!
+  },
+  response: {
+    data: {
+      'key': 'If you include MORE data, I won't be matched,
+    }
+  },
+},
+
+
+// 3. No mock is found, as expected
+
 ```
