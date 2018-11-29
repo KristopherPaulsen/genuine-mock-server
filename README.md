@@ -11,6 +11,7 @@
 * [Overview of Initizalation Script](#overview-of-initialization-script)
 * [Building the mock server using slurp mode](#building-the-mock-server-using-slurp-mode)
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
+* [Adding Regex and String Pattern Paths to your Mocks](#adding-regex-and-string-pattern-paths-to-your-mocks)
 * [How, Query, Param and Body work in mock files](#how-query-param-and-body-work-in-mock-files)
 * [Gotchas And FAQ](#gotchas-and-faqs)
 
@@ -30,7 +31,7 @@
       {
         request: {
           method: 'get',
-          path: '/api/helloworld/simple',
+          path: '/api/helloworld/example',
         },
         response: {
           data: {
@@ -59,7 +60,7 @@
 3. Curl that bad-boy!
 
    ```bash
-   curl 'http://localhost:8080/api/helloworld/simple'
+   curl 'http://localhost:8080/api/helloworld/example'
    ```
 
 
@@ -401,6 +402,40 @@ module.exports = defaultPath('/api/helloworld/defaultpath/', [
   },
 ]);
 ```
+
+## Adding Regex and String Pattern Paths to your Mocks
+Under the hood, `genuine-mock-server` uses `express`, so regex paths are standardized
+and simple.
+```javascript
+// Adding a regex as your path:
+
+module.exports = [
+  {
+    request: {
+      path: new RegExp(/api/g),
+      .../
+    },
+    response: {
+      // ...
+    },
+  },
+]
+
+// gets translated under the hood to
+
+
+app.get(yourRegexHere, () => {
+    // your mock data gets returned
+})
+```
+`string-patterns` like `'/ab(cd)?e'` are also supported (as they are part of the express)
+routing. Consult the `express` docs for more information: [link](#https://expressjs.com/en/guide/routing.html)
+
+
+*Note*: Same as any other routing framework, be mindfull of how your regex paths are intercepting.
+Like `express`, catchall routes will intercept *instead of* other already-defined paths.
+This may, or may not, be what you intended. If in doubt, register your regex paths later,
+after the other mocks.
 
 ## How Query Param and Body work in mock files
 
