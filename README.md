@@ -634,7 +634,7 @@ module.exports = [
     request: {
       path: '/api/helloworld/filter?age=28',
       query: {
-        age: '28', // Good, you're mock value is a string
+        age: '28', // Good, your mock value is a string
       },
     },
     response: {
