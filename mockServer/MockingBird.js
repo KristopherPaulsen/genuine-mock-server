@@ -23,12 +23,22 @@ const responseDefaults = {
     statusCode: 200,
 };
 
+//const regexWithHashParamToColon = (regex) => {
+  //return regex.toString()
+              //.split('\\')
+              //.join('')
+              //.replace(/\/\//g, '/')
+              //.replace(/(.*\/)([\w]*)$/, (_, first, second) => {
+                //return new RegExp(hashToColon(first), second);
+              //});
+//}
+
 const hashToColon = (path) => {
   if (path instanceof RegExp) {
     return path;
   }
 
-  if(!path.match(/(\/[\w-_]+\?.+)/)) {
+  if (!path.match(/(\/[\w-_]+\?.+)/)) {
     return path.replace(/#/g, ':');
   }
 
@@ -174,10 +184,6 @@ const init = ({ port, ...mockConfig }) => {
   flow(
     normalizeMocks,
     toPathMockMap,
-    mocks => {
-      console.log(JSON.stringify( mocks , null, 2 ));
-      return mocks
-    },
     partial(registerRoutes, mockServer, _),
     partial(startListening, mockServer, port)
   )(getMocks(mockConfig));

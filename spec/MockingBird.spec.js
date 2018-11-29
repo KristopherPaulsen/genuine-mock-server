@@ -13,6 +13,29 @@ const {
 // regexes
 // globs from express
 
+//describe('regexWithHashParamToColon', () => {
+  //it('returns new regex, that is same as old regex, but replaces hash path params with colons (:) ', () => {
+    //const badRegex = /\/api\/helloworld\/#name\/name\//g;
+    //const goodRegex = /\/api\/helloworld\/:name\/name\//g;
+
+    //expect(
+      //regexWithHashParamToColon(badRegex).toString(),
+    //).toBe(goodRegex.toString())
+  //});
+
+  //it('returns new regex, that is same as old regex, but replaces hash path params with colons (:) with multiple #', () => {
+    //const badRegex = /\/api\/#helloworld\/#name\/name\//g;
+    //const goodRegex = /\/api\/:helloworld\/:name\/name\//g;
+
+
+    //console.log(typeof regexWithHashParamToColon(badRegex));
+
+    //expect(
+      //regexWithHashParamToColon(badRegex).toString(),
+    //).toBe(goodRegex.toString())
+  //});
+//})
+
 describe('toPathMockMap()', () => {
 
   it('should build simple map', () => {
