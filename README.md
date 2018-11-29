@@ -91,7 +91,7 @@ for storing your mocks.
       {
         request: {
           method: 'get',
-          path: '/api/helloworld/simple',
+          path: '/api/helloworld/example',
         },
         response: {
           data: {
@@ -134,7 +134,7 @@ for storing your mocks.
 5. Curl that bad-boy!
 
    ```bash
-   curl http://localhost:8080/api/helloworld/simple
+   curl http://localhost:8080/api/helloworld/example
    ```
 
 </br>
