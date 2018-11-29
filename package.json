@@ -3,6 +3,10 @@
   "version": "1.2.6",
   "description": "A real fake mock server for http requests",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KristopherPaulsen/genuine-mock-server.git"
+  },
   "directories": {
     "test": "test"
   },
