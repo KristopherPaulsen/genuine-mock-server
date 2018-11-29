@@ -4,11 +4,17 @@ module.exports = [
       path: '/api/helloworld/very-generic-schema',
       method: 'get',
       matchType: 'schema',
-      query: {
-        required: ['somekey'],
-        somekey: {
-          type: 'string',
-          //... notice no value is given, anything will match!
+      schema: {
+        required: ['query'],
+        properties: {
+          query: {
+            properties: {
+              somekey: {
+                type: 'string',
+                // this is going to match a whole-lot of things...
+              }
+            }
+          }
         }
       }
     },
@@ -20,23 +26,30 @@ module.exports = [
   },
 
   {
+    // this mock will be never get picked up, the above mock is too general...
     request: {
-      // You won't be able to reach this one...
       path: '/api/helloworld/very-generic-schema',
       method: 'get',
       matchType: 'schema',
-      query: {
-        somekey: {
-          const: 'valueone'
-        },
-        anotherkey: {
-          const: 'valuetwo'
+      schema: {
+        required: ['query'],
+        properties: {
+          query: {
+            properties: {
+              somekey: {
+                type: 'string',
+              },
+              anotherkey: {
+                type: 'string',
+              }
+            }
+          }
         }
       }
     },
     response: {
       data: {
-        'key': 'You cant reach me, the top schema is too generic!',
+        'key': 'a schema matching mock endpoint! I match many things...'
       }
     }
   },

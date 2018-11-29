@@ -83,15 +83,11 @@ const routeByMatch = (mocks, res, { body, query, params }) => {
     response: { data, statusCode, waitTime }
   } = mocks.find(mock => areEqual({
     matchType: mock.request.matchType,
-    expected: {
-      body: mock.request.body,
-      query: mock.request.query,
-      params: mock.request.params,
-    },
+    expected: mock.request.schema,
     recieved: {
       body,
       query,
-      params
+      params,
     }
   }));
 
@@ -113,15 +109,10 @@ const registerRoutes = (server, pathMockMap) => (
 
 const areEqual = ({ matchType, expected, recieved }) => {
   if (matchType === 'exact') {
-    return isEqual(
-      [expected.body, expected.query, expected.params],
-      [recieved.body, recieved.query, recieved.params]
-    );
+    return isEqual(expected, recieved);
   }
 
-  return every(keys(expected), key => {
-    return matchesSchema(expected[key], recieved[key]);
-  });
+  return matchesSchema(expected, recieved);
 };
 
 const matchesSchema = (schema, recieved) => {
