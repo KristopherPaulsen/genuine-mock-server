@@ -23,30 +23,6 @@ const responseDefaults = {
     statusCode: 200,
 };
 
-//const regexWithHashParamToColon = (regex) => {
-  //return regex.toString()
-              //.split('\\')
-              //.join('')
-              //.replace(/\/\//g, '/')
-              //.replace(/(.*\/)([\w]*)$/, (_, first, second) => {
-                //return new RegExp(hashToColon(first), second);
-              //});
-//}
-
-const hashToColon = (path) => {
-  if (path instanceof RegExp) {
-    return path;
-  }
-
-  if (!path.match(/(\/[\w-_]+\?.+)/)) {
-    return path.replace(/#/g, ':');
-  }
-
-  const [_, paramPath, queryPath] = path.match(/(.+?)(\/[\w-_]+\?.+)/);
-
-  return `${paramPath.replace(/#/g, ':')}${queryPath}`;
-}
-
 const getMockStrategy = ({ mocks, pathToFiles}) => {
   if (mocks && !pathToFiles) {
     return getSuppliedMocks;
@@ -76,10 +52,7 @@ const getCombinedMocks = ({ pathToFiles, filePattern, mocks }) => ([
 
 const normalizeMocks = (mocks) => (
   mocks.map(({ request, response }) => ({
-    request: {
-      ...defaultsDeep(request, requestDefaults),
-      path: hashToColon(request.path),
-    },
+    request: defaultsDeep(request, requestDefaults),
     response: defaultsDeep(response, responseDefaults),
   }))
 );
@@ -197,7 +170,6 @@ module.exports = {
   getSuppliedMocks,
   getCombinedMocks,
   getSlurpedMocks,
-  hashToColon,
   defaultPath,
   init,
 };

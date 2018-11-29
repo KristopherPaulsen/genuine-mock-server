@@ -1,5 +1,4 @@
 const {
-  hashToColon,
   getMockStrategy,
   normalizeMocks,
   areEqual,
@@ -8,33 +7,6 @@ const {
   getSlurpedMocks,
   getSuppliedMocks,
 } = require('../mockServer/MockingBird.js');
-
-// hashToColon
-// regexes
-// globs from express
-
-//describe('regexWithHashParamToColon', () => {
-  //it('returns new regex, that is same as old regex, but replaces hash path params with colons (:) ', () => {
-    //const badRegex = /\/api\/helloworld\/#name\/name\//g;
-    //const goodRegex = /\/api\/helloworld\/:name\/name\//g;
-
-    //expect(
-      //regexWithHashParamToColon(badRegex).toString(),
-    //).toBe(goodRegex.toString())
-  //});
-
-  //it('returns new regex, that is same as old regex, but replaces hash path params with colons (:) with multiple #', () => {
-    //const badRegex = /\/api\/#helloworld\/#name\/name\//g;
-    //const goodRegex = /\/api\/:helloworld\/:name\/name\//g;
-
-
-    //console.log(typeof regexWithHashParamToColon(badRegex));
-
-    //expect(
-      //regexWithHashParamToColon(badRegex).toString(),
-    //).toBe(goodRegex.toString())
-  //});
-//})
 
 describe('toPathMockMap()', () => {
 
@@ -262,7 +234,7 @@ describe('areEqual()', () => {
 });
 
 describe('normalizeMocks()', () => {
-  it('returns mocks with hashes replaced with :, and default values', () => {
+  it('returns array of one mock default values', () => {
 
     const expected = [
       {
@@ -284,11 +256,10 @@ describe('normalizeMocks()', () => {
       }
     ];
 
-
     const result = normalizeMocks([
       {
         request: {
-          path: '/api/helloworld/name/#name',
+          path: '/api/helloworld/name/:name',
           method: 'get'
         },
         response: {
@@ -302,12 +273,12 @@ describe('normalizeMocks()', () => {
     expect(result).toEqual(expected);
   });
 
-  it('returns mocks with hashes replaced with :, and default values for multiple mocks', () => {
+  it('returns default values for multiple mocks', () => {
 
     const result = normalizeMocks([
       {
         request: {
-          path: '/api/helloworld/name/#name',
+          path: '/api/helloworld/name/:name',
           method: 'get'
         },
         response: {
@@ -319,7 +290,7 @@ describe('normalizeMocks()', () => {
 
       {
         request: {
-          path: "/api/helloworld/name/#name/age/#age",
+          path: "/api/helloworld/name/:name/age/:age",
           method: "get",
           body: {},
           query: {},
@@ -413,57 +384,4 @@ describe('getMockStrategy()', () => {
 
     expect(strategy).toBe(getCombinedMocks);
   });
-});
-
-describe('hashToColon()', () => {
-  it('should replace hash with colon in simple path', () => {
-    expect(hashToColon('/api/param/#param')).toEqual('/api/param/:param');
-  });
-
-  it('should replace hash with colon in route but not string pattern', () => {
-    expect(hashToColon('/api/param/#param?+*/rest/of/path')).toEqual('/api/param/:param?+*/rest/of/path');
-  });
-
-  it('should replace multiples hashes with colons in simple path', () => {
-    expect(hashToColon('/api/param/#param/paramtwo/#paramtwo')).toEqual('/api/param/:param/paramtwo/:paramtwo');
-  });
-
-  it('should replace multiples separated hashes with colons in simple path', () => {
-    expect(hashToColon('/api/param/#param/foo/paramtwo/#paramtwo')).toEqual('/api/param/:param/foo/paramtwo/:paramtwo');
-  });
-
-  it('should not replace hashes with colons in querystring', () => {
-    expect(hashToColon('/api/querystring?foo=bar&#other=thing')).toEqual('/api/querystring?foo=bar&#other=thing');
-  });
-
-  it('should replace hashes with colons path, but not in json filled query string', () => {
-    expect(hashToColon(`/api/param/#param/querystring?foo='{"path":"/api/param/#param/"}'`))
-      .toEqual(`/api/param/:param/querystring?foo='{"path":"/api/param/#param/"}'`);
-  });
-
-  it('should replace hashes with colons in path, but not in json filled querystring containing a querystring', () => {
-    expect(hashToColon(`/api/param/#param/querystring?foo='{"path":"/api/param/#param/querystring?foo=#bar"}'`))
-      .toEqual(`/api/param/:param/querystring?foo='{"path":"/api/param/#param/querystring?foo=#bar"}'`);
-  });
-
-  it('should replace hashes with colons in path, but not in json filled query string that is also uri encoded', () => {
-    expect(hashToColon(`/api/param/#param/querystring?foo='%7B%22path%22:%22/api/param/#param/querystring?foo=#bar%22%7D'`))
-      .toEqual(`/api/param/:param/querystring?foo='%7B%22path%22:%22/api/param/#param/querystring?foo=#bar%22%7D'`);
-  });
-
-  it('should replace hashes with colons in uriEncoded path, but not in json filled query string that is also uri encoded', () => {
-    expect(hashToColon(`/api/param%20%20/#param%20%20/querystring?foo='%7B%22path%22:%22/api/param/#param/querystring?foo=#bar%22%7D'`))
-      .toEqual(`/api/param%20%20/:param%20%20/querystring?foo='%7B%22path%22:%22/api/param/#param/querystring?foo=#bar%22%7D'`);
-  });
-
-  it('should replace hashes with colons in uriEncoded path but not in json filled query string that is also uri encoded', () => {
-    expect(hashToColon(`/api/param%20%20/#param%20%20/querystring?foo='%7B%22path%22:%22/api/param/#param/querystring?foo=#bar%22%7D'`))
-      .toEqual(`/api/param%20%20/:param%20%20/querystring?foo='%7B%22path%22:%22/api/param/#param/querystring?foo=#bar%22%7D'`);
-  });
-
-  it('should replace hashes with colons in uriEncoded path but not in json filled query string that is also encodeURIComponent', () => {
-    expect(hashToColon(`/api/param%20%20/#param%20%20/querystring?foo%253D'%257B%2522path%2522%253A%2522%252Fapi%252Fparam%252F%2523param%252Fquerystring%253Ffoo%253D%2523bar%2522%257D'`))
-      .toEqual(`/api/param%20%20/:param%20%20/querystring?foo%253D'%257B%2522path%2522%253A%2522%252Fapi%252Fparam%252F%2523param%252Fquerystring%253Ffoo%253D%2523bar%2522%257D'`)
-  });
-
 });
