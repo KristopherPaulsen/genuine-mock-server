@@ -700,7 +700,7 @@ and express itself, which parses querystring values into key value pairs (with v
 module.exports = [
   {
     request: {
-      path: '/api/helloworld/filter?age=28',
+      path: '/api/helloworld/filter',
       query: {
         age: '28', // Good, your mock value is a string
       },
@@ -715,7 +715,7 @@ module.exports = [
 module.exports = [
   {
     request: {
-      path: '/api/helloworld/filter?age=28',
+      path: '/api/helloworld/filter',
       query: {
         age: 28, // BAD!!! This will not match, the server will recieve 28 as a string
       },

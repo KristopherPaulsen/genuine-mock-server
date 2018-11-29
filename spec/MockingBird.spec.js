@@ -200,16 +200,18 @@ describe('areEqual()', () => {
     expect(areEqual({
       matchType: 'schema',
       expected: {
-        required: ['body'],
-        properties: {
-          body: {
-            properties: {
-              key: {
-                type: 'string',
+        schema: {
+          required: ['body'],
+          properties: {
+            body: {
+              properties: {
+                key: {
+                  type: 'string',
+                }
               }
             }
           }
-        }
+        },
       },
       recieved: {
         body: {
@@ -223,21 +225,23 @@ describe('areEqual()', () => {
     expect(areEqual({
       matchType: 'schema',
       expected: {
-        required: ['body'],
-        properties: {
-          body: {
-            properties: {
-              key: {
-                type: 'string',
-                const: 'value'
+        schema: {
+          required: ['body'],
+          properties: {
+            body: {
+              properties: {
+                key: {
+                  type: 'string',
+                  const: 'wrongvalue',
+                }
               }
             }
           }
-        }
+        },
       },
       recieved: {
         body: {
-          key: 'notvalue',
+          key: 'value',
         }
       }
     })).toBe(false);
