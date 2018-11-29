@@ -22,7 +22,7 @@ module.exports = [
   {
     request: {
       // You won't be able to reach this one...
-      path: '/api/helloworld/schema',
+      path: '/api/helloworld/very-generic-schema',
       method: 'get',
       matchType: 'schema',
       query: {
@@ -40,4 +40,4 @@ module.exports = [
       }
     }
   },
-]
+];
