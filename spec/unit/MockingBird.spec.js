@@ -6,7 +6,7 @@ const {
   getCombinedMocks,
   getSlurpedMocks,
   getSuppliedMocks,
-} = require('../mockServer/MockingBird.js');
+} = require('../../mockServer/MockingBird.js');
 
 describe('toPathMockMap()', () => {
 
