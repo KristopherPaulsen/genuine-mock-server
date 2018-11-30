@@ -1,4 +1,4 @@
-const { defaultPath } = require('../MockingBird.js');
+const { defaultPath } = require('.././../../mockServer/MockingBird.js');
 
 module.exports = defaultPath('/api/helloworld/defaultpath/', [
   {

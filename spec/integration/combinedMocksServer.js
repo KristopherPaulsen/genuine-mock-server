@@ -2,7 +2,7 @@ const { init } = require('../../mockServer/MockingBird.js');
 
 init({
   port: 8080,
-  pathToFiles: './Mocks/',
+  pathToFiles: 'spec/integration/Mocks',
   filePattern: '*.js', // whatever file extension you want to target
   mocks: [
     {
@@ -12,7 +12,7 @@ init({
       },
       response: {
         data: {
-          'key': 'I was supplied!',
+          'key': 'I am the hello world example from a supplied mock!',
         }
       },
     },
