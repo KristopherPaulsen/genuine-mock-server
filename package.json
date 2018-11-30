@@ -26,7 +26,6 @@
   "scripts": {
     "test": "jest",
     "spec": "npm run test -- --watch",
-    "integration": "npm run test",
     "start": "nodemon mockServer/server.js"
   },
   "author": {
