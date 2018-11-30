@@ -20,11 +20,13 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
+    "axios": "^0.18.0",
     "jest": "^23.5.0"
   },
   "scripts": {
     "test": "jest",
     "spec": "npm run test -- --watch",
+    "integration": "npm run test",
     "start": "nodemon mockServer/server.js"
   },
   "author": {
