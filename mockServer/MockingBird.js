@@ -101,9 +101,7 @@ const registerRoutes = (server, pathMockMap) => (
   })
 );
 
-const areEqual = ({
-  matchType, expected, recieved,
-}) => {
+const areEqual = ({ matchType, expected, recieved }) => {
   if (matchType === 'exact') {
     return isEqual(
       {
