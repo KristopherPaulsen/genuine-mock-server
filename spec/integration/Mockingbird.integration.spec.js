@@ -16,8 +16,6 @@ describe('init() for supplied mocks, but not mock file slurping', () => {
       expect(data).toEqual({
         key: 'I am the first supplied mock'
       });
-    } catch (error) {
-      console.log(error);
     } finally {
       server.kill();
     }
@@ -34,8 +32,6 @@ describe('init() for supplied mocks, but not mock file slurping', () => {
       expect(data).toEqual({
         key: 'I am the second supplied mock'
       });
-    } catch(error) {
-      console.log(error);
     } finally {
       server.kill();
     }
@@ -54,10 +50,8 @@ describe('init() for file slurping, but no supplied mocks', () => {
       const { data } = await localhostAxios.get('api/helloworld/suppliedmock/second');
 
       expect(data).toEqual({
-        key: 'I am the second supplied mock'
+        key: '?I am the second supplied mock'
       });
-    } catch(error) {
-      console.log(error);
     } finally {
       server.kill();
     }
