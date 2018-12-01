@@ -157,13 +157,14 @@ module.exports = [
 
 #### Request Blob
 
-| Key    | Type   | Description                                         | Required                   |
-|--------|--------|-----------------------------------------------------|----------------------------|
-| path   | String | The api endpoint path (not including querystring)   | required                   |
-| method | String | The http method                                     | optional (defaults to GET) |
-| params | Object | An object of key / value pairs for path params      | optional (defaults to {})  |
-| body   | Object | An object of key / value pairs for the body request | optional (defaults to {})  |
-| query  | Object | An object of key / value pairs for the querystring  | optional (defaults to {})  |
+| Key       | Type   | Description                                              | Required                       |
+|--------   |--------|-----------------------------------------------------     |----------------------------    |
+| path      | String | The api endpoint path (not including querystring)        | required                       |
+| method    | String | The http method                                          | optional (defaults to GET)     |
+| params    | Object | An object of key / value pairs for path params           | optional (defaults to {})      |
+| body      | Object | An object of key / value pairs for the body request      | optional (defaults to {})      |
+| query     | Object | An object of key / value pairs for the querystring       | optional (defaults to {})      |
+| matchType | String | A string to select the match algorithm (see JSON Schema) | optional (defaults to 'exact') |
 
 #### Response Blob
 
@@ -226,24 +227,24 @@ init({
 
 const { init } = require('genuine-mock-server');
 
-    const mocks = [
-      {
-        request: {
-          method: 'get',
-          path: '/api/helloworld/simple',
-        },
-        response: {
-          data: {
-            'key': 'Hello World!',
-          }
-        },
-      },
-    ];
+const mocks = [
+  {
+    request: {
+      method: 'get',
+      path: '/api/helloworld/simple',
+    },
+    response: {
+      data: {
+        'key': 'Hello World!',
+      }
+    },
+  },
+];
 
-    init({
-      port: 8080,
-      mocks: mocks,
-    });
+init({
+  port: 8080,
+  mocks: mocks,
+});
 ```
 
 <br>
@@ -276,7 +277,7 @@ init({
 });
 ```
 
-*Note: Whichever method you choose is up to you. Provided
+*Note*: Whichever method you choose is up to you. Provided
 mocks are added first, then slurped mocks.
 
 
@@ -463,7 +464,9 @@ module.exports = [
 
 Genuine Mock server follows a simple strategy for mocking files. `Request` represents
 any given http request sent to the server, with a given set of paramaters. Any request
-that exactly matches these paramaters will return the data supplied in `response`.
+that **exactly matches these paramaters** will return the data supplied in `response`.
+
+For more information on how *exact matching* works, view: [How exact matches work](#exact-matches-for-mocking)
 
 
 ### Query Example
@@ -726,7 +729,7 @@ module.exports = [
 ]
 ```
 
-### Exact Matches for mocking
+### Exact Matches for Mocking
 If you're using the default mock matching (i.e exact matching);
 ```javascript
 {
@@ -742,8 +745,8 @@ If you're using the default mock matching (i.e exact matching);
 
 you need to be sure you're meeting all the data requirements, no more, no less.
 
-* If you're supply a *subset* of the data, your mock *will not* be matched
-* If you supply a superset of the data, your mock *will not* be matched
+* If you're supply a **subset** of the data, your mock **will not** be matched
+* If you supply a **superset** of the data, your mock **will not** be matched
 
 ```javascript
 // Example of a potential problem below
@@ -792,3 +795,7 @@ query: {
 // 3. No mock is found, as expected
 
 ```
+
+If you need more nuanced *generic-matching*, consider using: `matchType: 'schema'`
+
+[matching with json schema](#subset-and-structural-matching-with-json-schema)
