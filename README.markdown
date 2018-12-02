@@ -11,7 +11,9 @@
 * [Overview of Initizalation Script](#overview-of-initialization-script)
 * [Building the mock server using slurp mode](#building-the-mock-server-using-slurp-mode)
 * [Adding Paths to Mocks](#adding-paths-to-mocks)
+* [Adding Regex and String Pattern Paths to your Mocks](#adding-regex-and-string-pattern-paths-to-your-mocks)
 * [How, Query, Param and Body work in mock files](#how-query-param-and-body-work-in-mock-files)
+* [Subset and Structural Matching with JSON Schema](#subset-and-structural-matching-with-json-schema)
 * [Gotchas And FAQ](#gotchas-and-faqs)
 
 ## Getting Started
@@ -30,7 +32,7 @@
       {
         request: {
           method: 'get',
-          path: '/api/helloworld/simple',
+          path: '/api/helloworld/example',
         },
         response: {
           data: {
@@ -59,7 +61,7 @@
 3. Curl that bad-boy!
 
    ```bash
-   curl 'http://localhost:8080/api/helloworld/simple'
+   curl 'http://localhost:8080/api/helloworld/example'
    ```
 
 
@@ -90,7 +92,7 @@ for storing your mocks.
       {
         request: {
           method: 'get',
-          path: '/api/helloworld/simple',
+          path: '/api/helloworld/example',
         },
         response: {
           data: {
@@ -133,7 +135,7 @@ for storing your mocks.
 5. Curl that bad-boy!
 
    ```bash
-   curl http://localhost:8080/api/helloworld/simple
+   curl http://localhost:8080/api/helloworld/example
    ```
 
 </br>
@@ -155,13 +157,14 @@ module.exports = [
 
 #### Request Blob
 
-| Key    | Type   | Description                                         | Required                   |
-|--------|--------|-----------------------------------------------------|----------------------------|
-| path   | String | The api endpoint path (not including querystring)   | required                   |
-| method | String | The http method                                     | optional (defaults to GET) |
-| params | Object | An object of key / value pairs for path params      | optional (defaults to {})  |
-| body   | Object | An object of key / value pairs for the body request | optional (defaults to {})  |
-| query  | Object | An object of key / value pairs for the querystring  | optional (defaults to {})  |
+| Key       | Type   | Description                                              | Required                       |
+|--------   |--------|-----------------------------------------------------     |----------------------------    |
+| path      | String | The api endpoint path (not including querystring)        | required                       |
+| method    | String | The http method                                          | optional (defaults to GET)     |
+| params    | Object | An object of key / value pairs for path params           | optional (defaults to {})      |
+| body      | Object | An object of key / value pairs for the body request      | optional (defaults to {})      |
+| query     | Object | An object of key / value pairs for the querystring       | optional (defaults to {})      |
+| matchType | String | A string to select the match algorithm (see JSON Schema) | optional (defaults to 'exact') |
 
 #### Response Blob
 
@@ -224,24 +227,24 @@ init({
 
 const { init } = require('genuine-mock-server');
 
-    const mocks = [
-      {
-        request: {
-          method: 'get',
-          path: '/api/helloworld/simple',
-        },
-        response: {
-          data: {
-            'key': 'Hello World!',
-          }
-        },
-      },
-    ];
+const mocks = [
+  {
+    request: {
+      method: 'get',
+      path: '/api/helloworld/simple',
+    },
+    response: {
+      data: {
+        'key': 'Hello World!',
+      }
+    },
+  },
+];
 
-    init({
-      port: 8080,
-      mocks: mocks,
-    });
+init({
+  port: 8080,
+  mocks: mocks,
+});
 ```
 
 <br>
@@ -274,7 +277,7 @@ init({
 });
 ```
 
-*Note: Whichever method you choose is up to you. Provided
+*Note*: Whichever method you choose is up to you. Provided
 mocks are added first, then slurped mocks.
 
 
@@ -402,6 +405,40 @@ module.exports = defaultPath('/api/helloworld/defaultpath/', [
 ]);
 ```
 
+## Adding Regex and String Pattern Paths to your Mocks
+Under the hood, `genuine-mock-server` uses `express`, so regex paths are standardized
+and simple.
+```javascript
+// Adding a regex as your path:
+
+module.exports = [
+  {
+    request: {
+      path: new RegExp(/api/g),
+      .../
+    },
+    response: {
+      // ...
+    },
+  },
+]
+
+// gets translated under the hood to
+
+
+app.get(yourRegexHere, () => {
+    // your mock data gets returned
+})
+```
+`string-patterns` like `'/ab(cd)?e'` are also supported (as they are part of the express)
+routing. Consult the `express` docs for more information: [link](#https://expressjs.com/en/guide/routing.html)
+
+
+*Note*: Same as any other routing framework, be mindfull of how your regex paths are intercepting.
+Like `express`, catchall routes will intercept *instead of* other already-defined paths.
+This may, or may not, be what you intended. If in doubt, register your regex paths later,
+after the other mocks.
+
 ## How Query Param and Body work in mock files
 
 ```javascript
@@ -427,7 +464,9 @@ module.exports = [
 
 Genuine Mock server follows a simple strategy for mocking files. `Request` represents
 any given http request sent to the server, with a given set of paramaters. Any request
-that exactly matches these paramaters will return the data supplied in `response`.
+that **exactly matches these paramaters** will return the data supplied in `response`.
+
+For more information on how *exact matching* works, view: [How exact matches work](#exact-matches-for-mocking)
 
 
 ### Query Example
@@ -579,6 +618,73 @@ For more information on what the mock files look like with a mix of path params,
 be sure to check out the example repo (Sometimes an example is worth a thousand words!)
 * [An Example Repo](https://github.com/KristopherPaulsen/genuine-mock-server-helloworld)
 
+## Subset and Structural Matching with JSON Schema
+`genuine-mock-server` also alows for mapping mocks-to-requests using `Json Schema`
+<br>
+<br>
+[JSON Schema Standard](#https://json-schema.org/)
+<br>
+[JSON Schema Node Package](#https://github.com/epoberezkin/ajv)
+
+This means you can match requests based on generalized subset descriptions of
+the incoming data, instead of EXACT matches [as used by default](#how-query-param-and-body-work-in-mock-files)
+
+```javascript
+module.exports = [
+  {
+    request: {
+      path: '/api/helloworld/schema',
+      query: {
+        age: '28',
+      },
+    },
+    response: {
+      data: {
+        someKey: "I am the example data"
+      }
+    },
+  },
+]
+
+// 1. Example semi-psuedocode axios
+
+axios.get('/api/helloworld/schema?somekey=valuehere');
+
+// 2. Mock server compares predescribed schema, to incoming request using JSON schema
+
+{
+  required: ['query'],
+  properties: {
+    query: {
+      properties: {
+        somekey: {
+          type: 'string',
+          const: 'valuehere'
+        }
+      }
+    }
+  }
+}
+
+// compared against ALL recieved request data
+
+{
+  query: {
+    somekey: 'valuehere'
+  },
+  body: {},
+  params: {},
+}
+
+// 3. Example response if it matches
+
+{
+  someKey: "I am the example data"
+}
+
+// 4. Otherwise, mock server keeps itterating
+```
+
 ## Gotchas and FAQs
 
 ### Query String values ... they're ALWAYS strings...
@@ -597,9 +703,9 @@ and express itself, which parses querystring values into key value pairs (with v
 module.exports = [
   {
     request: {
-      path: '/api/helloworld/filter?age=28',
+      path: '/api/helloworld/filter',
       query: {
-        age: '28', // Good, you're mock value is a string
+        age: '28', // Good, your mock value is a string
       },
     },
     response: {
@@ -612,7 +718,7 @@ module.exports = [
 module.exports = [
   {
     request: {
-      path: '/api/helloworld/filter?age=28',
+      path: '/api/helloworld/filter',
       query: {
         age: 28, // BAD!!! This will not match, the server will recieve 28 as a string
       },
@@ -622,3 +728,74 @@ module.exports = [
     }
 ]
 ```
+
+### Exact Matches for Mocking
+If you're using the default mock matching (i.e exact matching);
+```javascript
+{
+  request: {
+    // ...
+    matchType: 'exact' // Genuine-mock-server assumes this matchtype by default
+  },
+  response: {
+    // ...
+  }
+}
+```
+
+you need to be sure you're meeting all the data requirements, no more, no less.
+
+* If you're supply a **subset** of the data, your mock **will not** be matched
+* If you supply a **superset** of the data, your mock **will not** be matched
+
+```javascript
+// Example of a potential problem below
+
+const mocks = [
+  {
+    request: {
+      method: 'get',
+      path: '/api/helloworld/mismatch',
+    },
+    response: {
+      data: {
+        'key': 'If you include MORE data, I wont be matched',
+      }
+    },
+  },
+];
+
+// 1. Example semi-psuedocode axios
+
+axios.get('/api/helloworld/mismatch?extra=data');
+
+// 2. The mock server recieves a `get` request for '/api/helloworld/mismatch',
+//    with query data...
+
+query: {
+  extra: 'data'
+}
+
+//    Your mocked WILL NOT be matched, since your mock declares `query` have no data
+
+{
+  request: {
+    method: 'get',
+    path: '/api/helloworld/mismatch',
+    // <------------ No query data provided, considered empty!
+  },
+  response: {
+    data: {
+      'key': 'If you include MORE data, I won't be matched,
+    }
+  },
+},
+
+
+// 3. No mock is found, as expected
+
+```
+
+If you need more nuanced *generic-matching*, consider using: `matchType: 'schema'`
+
+[matching with json schema](#subset-and-structural-matching-with-json-schema)

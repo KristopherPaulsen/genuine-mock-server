@@ -2,7 +2,7 @@ module.exports = [
   {
     request: {
       method: 'get',
-      path: '/api/helloworld/simple',
+      path: '/api/helloworld/example',
     },
     response: {
       data: {
