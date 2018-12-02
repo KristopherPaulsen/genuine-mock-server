@@ -288,6 +288,45 @@ describe('normalizeMocks()', () => {
     expect(result).toEqual(expected);
   });
 
+  it('returns lowercase, normalized http method', () => {
+
+    const result = normalizeMocks([
+      {
+        request: {
+          path: '/api/helloworld/name/:name',
+          method: 'GET'
+        },
+        response: {
+          data: {
+            'key': 'Oops, forgot to lowercase HTTP method'
+          }
+        }
+      },
+    ]);
+
+    const expected = [
+      {
+        request: {
+          path: "/api/helloworld/name/:name",
+          method: "get",
+          body: {},
+          query: {},
+          params: {},
+          matchType: "exact"
+        },
+        response: {
+          data: {
+            key: "Oops, forgot to lowercase HTTP method"
+          },
+          waitTime: 0,
+          statusCode: 200
+        }
+      },
+    ];
+
+    expect(result).toEqual(expected);
+  });
+
   it('returns default values for multiple mocks', () => {
 
     const result = normalizeMocks([

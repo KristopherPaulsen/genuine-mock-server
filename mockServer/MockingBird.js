@@ -52,7 +52,10 @@ const getCombinedMocks = ({ pathToFiles, filePattern, mocks }) => ([
 
 const normalizeMocks = (mocks) => (
   mocks.map(({ request, response }) => ({
-    request: defaultsDeep(request, requestDefaults),
+    request: {
+      ...defaultsDeep(request, requestDefaults),
+      method: request.method.toLowerCase(),
+    },
     response: defaultsDeep(response, responseDefaults),
   }))
 );
