@@ -26,7 +26,8 @@ describe('toPathMockMap()', () => {
           statusCode: 200,
           data: {
             "key": "no params, no body, no query response"
-          }
+          },
+          headers: {},
         }
       }
     ];
@@ -47,7 +48,8 @@ describe('toPathMockMap()', () => {
             statusCode: 200,
             data: {
               "key": "no params, no body, no query response"
-            }
+            },
+            headers: {},
           }
         }
       ]
@@ -66,7 +68,10 @@ describe('toPathMockMap()', () => {
           waitTime: 0,
           data: {
             key: "no params, no body, no query response",
-          }
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          },
         }
       },
       {
@@ -83,7 +88,10 @@ describe('toPathMockMap()', () => {
           waitTime: 0,
           data: {
             key: "multi-param",
-          }
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          },
         }
       },
       {
@@ -99,7 +107,10 @@ describe('toPathMockMap()', () => {
           waitTime: 0,
           data: {
             key: "single param",
-          }
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          },
         }
       },
     ];
@@ -116,8 +127,11 @@ describe('toPathMockMap()', () => {
             waitTime: 0,
             data: {
               key: "no params, no body, no query response",
-            }
-          }
+            },
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          },
         },
       ],
       "/api/example/param/:param": [
@@ -135,7 +149,10 @@ describe('toPathMockMap()', () => {
             waitTime: 0,
             data: {
               key: "multi-param",
-            }
+            },
+            headers: {
+              'Content-Type': 'application/json'
+            },
           }
         },
         {
@@ -151,7 +168,10 @@ describe('toPathMockMap()', () => {
             waitTime: 0,
             data: {
               key: "single param",
-            }
+            },
+            headers: {
+              'Content-Type': 'application/json'
+            },
           }
         }
       ]
@@ -266,7 +286,8 @@ describe('normalizeMocks()', () => {
             key: "uri hello world!"
           },
           waitTime: 0,
-          statusCode: 200
+          statusCode: 200,
+          headers: {},
         }
       }
     ];
@@ -319,7 +340,8 @@ describe('normalizeMocks()', () => {
             key: "Oops, forgot to lowercase HTTP method"
           },
           waitTime: 0,
-          statusCode: 200
+          statusCode: 200,
+          headers: {},
         }
       },
     ];
@@ -338,7 +360,8 @@ describe('normalizeMocks()', () => {
         response: {
           data: {
             'key': 'uri hello world!'
-          }
+          },
+          headers: {},
         }
       },
 
@@ -356,7 +379,8 @@ describe('normalizeMocks()', () => {
             key: "uri hello world!"
           },
           waitTime: 0,
-          statusCode: 200
+          statusCode: 200,
+          headers: {},
         }
       }
     ]);
@@ -376,7 +400,8 @@ describe('normalizeMocks()', () => {
             key: "uri hello world!"
           },
           waitTime: 0,
-          statusCode: 200
+          statusCode: 200,
+          headers: {},
         }
       },
 
@@ -394,7 +419,8 @@ describe('normalizeMocks()', () => {
             key: "uri hello world!"
           },
           waitTime: 0,
-          statusCode: 200
+          statusCode: 200,
+          headers: {},
         }
       }
     ];

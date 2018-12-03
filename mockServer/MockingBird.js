@@ -19,6 +19,7 @@ const requestDefaults = {
 
 const responseDefaults = {
     data: {},
+    headers: {},
     waitTime: 0,
     statusCode: 200,
 };
@@ -90,6 +91,7 @@ const routeByMatch = (mocks, res, actualRequest) => {
 
   setTimeout(() => (
     res.status(bestMatch.response.statusCode)
+       .header(bestMatch.response.headers)
        .send(bestMatch.response.data)
   ), bestMatch.response.waitTime);
 };

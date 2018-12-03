@@ -168,11 +168,12 @@ module.exports = [
 
 #### Response Blob
 
-| Key        | Type    | Description                                                         | Required                                    |
-|------------|---------|---------------------------------------------------------------------|---------------------------------------------|
-| waitTime   | Integer | The time in milliseconds the mockserver will wait before responding | optional (defaults to 0)                    |
-| statusCode | Integer | The http status code in the response                                | optional (defaults to 200)                  |
-| data       | Object  | The data that will be returned in the response from the mock server | optional (by why would you leave it blank?) |
+| Key        | Type    | Description                                                               | Required                                      |
+|------------|---------|---------------------------------------------------------------------------|-----------------------------------------------|
+| waitTime   | Integer | The time in milliseconds the mockserver will wait before responding       | optional (defaults to 0)                      |
+| statusCode | Integer | The http status code in the response                                      | optional (defaults to 200)                    |
+| data       | Object  | The data that will be returned in the response from the mock server       | optional (by why would you leave it blank?)   |
+| headers    | Object  | a set of key value-pairs (please use strings) for extra response headers  | optional (defaults to normal express headers) |
 
 </br>
 

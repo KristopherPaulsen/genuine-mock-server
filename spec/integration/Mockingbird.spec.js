@@ -1,9 +1,11 @@
 const axios = require('axios');
 const { init } = require('../../mockServer/MockingBird.js');
 const { spawnServer } = require('./initTestServer.js');
+const { httpGetPromise } = require('./httpWithPromise.js');
+
+const localhostAxios = axios.create({ baseURL: 'http://localhost:8080'} );
 
 describe('init() for supplied mocks, but not mock file slurping', () => {
-  const localhostAxios = axios.create({ baseURL: 'http://localhost:8080'} );
 
   it('creates a mock server and serves mock data when given no files, but supplied mocks', async () => {
     const server  = await spawnServer({
@@ -39,7 +41,6 @@ describe('init() for supplied mocks, but not mock file slurping', () => {
 });
 
 describe('init() for file slurping, but no supplied mocks', () => {
-  const localhostAxios = axios.create({ baseURL: 'http://localhost:8080'} );
 
   it('creates a mock server, and serves up the hello world mock data', async () => {
     const server  = await spawnServer({
@@ -59,7 +60,6 @@ describe('init() for file slurping, but no supplied mocks', () => {
 });
 
 describe('init() for file slurping and supplied mocks', () => {
-  const localhostAxios = axios.create({ baseURL: 'http://localhost:8080'} );
 
   it('creates a mock server, and serves up the hello world mock data from a file', async () => {
     const server  = await spawnServer({
@@ -88,6 +88,22 @@ describe('init() for file slurping and supplied mocks', () => {
       expect(data).toEqual({
         key: 'I am the hello world example from a supplied mock!'
       });
+    } finally {
+      server.kill();
+    }
+  });
+});
+
+describe('init() creates mock server that returns custom headers on response', () => {
+  it('creates a mock server, and responses with customer headers', async () => {
+    const server  = await spawnServer({
+      serverPath: './spec/integration/fileOnlyServer.js',
+    });
+
+    try {
+      /* helper function is used as axios doesn't easily expose headers ... */
+      const responseHeaders  = await httpGetPromise(`http://localhost:8080/api/helloworld/setheaders`);
+      expect(responseHeaders).toMatchObject({ 'custom-header': 'customValue'});
     } finally {
       server.kill();
     }

@@ -25,7 +25,7 @@
   "scripts": {
     "test": "jest",
     "spec": "npm run test -- --watch",
-    "start": "nodemon mockServer/server.js"
+    "all-spec": "npm run test -- --watch spec .*"
   },
   "author": {
     "name": "Kristopher C. Paulsen",
