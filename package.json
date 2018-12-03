@@ -27,6 +27,13 @@
     "spec": "npm run test -- --watch",
     "all-spec": "npm run test -- --watch spec .*"
   },
+  "keywords": [
+    "mock",
+    "server",
+    "test",
+    "rest",
+    "api"
+  ],
   "author": {
     "name": "Kristopher C. Paulsen",
     "email": "kristopherpaulsen+npm@gmail.com"
