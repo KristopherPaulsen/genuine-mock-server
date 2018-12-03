@@ -623,9 +623,9 @@ be sure to check out the example repo (Sometimes an example is worth a thousand 
 `genuine-mock-server` also alows for mapping mocks-to-requests using `Json Schema`
 <br>
 <br>
-[JSON Schema Standard](#https://json-schema.org/)
+[JSON Schema Standard](https://json-schema.org/)
 <br>
-[JSON Schema Node Package](#https://github.com/epoberezkin/ajv)
+[JSON Schema Node Package](https://github.com/epoberezkin/ajv)
 
 This means you can match requests based on generalized subset descriptions of
 the incoming data, instead of EXACT matches [as used by default](#how-query-param-and-body-work-in-mock-files)
