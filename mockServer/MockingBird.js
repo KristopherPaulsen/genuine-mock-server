@@ -24,6 +24,14 @@ const responseDefaults = {
     statusCode: 200,
 };
 
+const dumpMocks = (mockConfig) => {
+  const getMocks = getMockStrategy(mockConfig);
+
+  return normalizeMocks(
+    getMocks(mockConfig)
+  );
+}
+
 const getMockStrategy = ({ mocks, pathToFiles}) => {
   if (mocks && !pathToFiles) {
     return getSuppliedMocks;
@@ -172,6 +180,7 @@ const init = ({ port, ...mockConfig }) => {
 
 module.exports = {
   areEqual,
+  dumpMocks,
   normalizeMocks,
   toPathMockMap,
   getMockStrategy,

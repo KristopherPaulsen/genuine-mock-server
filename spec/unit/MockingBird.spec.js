@@ -1,4 +1,5 @@
 const {
+  dumpMocks,
   getMockStrategy,
   normalizeMocks,
   areEqual,
@@ -463,5 +464,141 @@ describe('getMockStrategy()', () => {
     const strategy = getMockStrategy(mockConfig);
 
     expect(strategy).toBe(getCombinedMocks);
+  });
+});
+
+describe('dumpMocks()', () => {
+  it('dumps out all files when using slurp mode, without creating server', async () => {
+    const result = dumpMocks({
+      pathToFiles: 'spec/unit/mocks/',
+      filePattern: '*.js', // whatever file extension you want to target
+    });
+
+    const expected = [
+      {
+        "request": {
+          "method": "get",
+          "path": "/api/helloworld/example",
+          "body": {},
+          "query": {},
+          "params": {},
+          "matchType": "exact"
+        },
+        "response": {
+          "data": {
+            "key": "Hello World!"
+          },
+          "headers": {},
+          "waitTime": 0,
+          "statusCode": 200
+        }
+      }
+    ];
+
+    expect(result).toEqual(expected);
+  });
+
+  it('dumps out all files when using mock mode, without creating server', async () => {
+    const result = dumpMocks({
+      mocks: [
+        {
+          "request": {
+            "method": "get",
+            "path": "/api/helloworld/example",
+          },
+          "response": {
+            "data": {
+              "key": "Hello World!"
+            },
+          }
+        }
+      ]
+    });
+
+    const expected = [
+      {
+        "request": {
+          "method": "get",
+          "path": "/api/helloworld/example",
+          "body": {},
+          "query": {},
+          "params": {},
+          "matchType": "exact"
+        },
+        "response": {
+          "data": {
+            "key": "Hello World!"
+          },
+          "headers": {},
+          "waitTime": 0,
+          "statusCode": 200
+        }
+      }
+    ];
+
+
+    expect(result).toEqual(expected);
+  });
+
+  it('dumps out all files when using combinedMocks, without creating server', async () => {
+    const result = dumpMocks({
+      pathToFiles: 'spec/unit/mocks/',
+      filePattern: '*.js', // whatever file extension you want to target
+      mocks: [
+        {
+          "request": {
+            "method": "get",
+            "path": "/api/helloworld/example2",
+          },
+          "response": {
+            "data": {
+              "key": "Hello World!"
+            },
+          }
+        }
+      ]
+    });
+
+    const expected = [
+      {
+        "request": {
+          "method": "get",
+          "path": "/api/helloworld/example2",
+          "body": {},
+          "query": {},
+          "params": {},
+          "matchType": "exact"
+        },
+        "response": {
+          "data": {
+            "key": "Hello World!"
+          },
+          "headers": {},
+          "waitTime": 0,
+          "statusCode": 200
+        }
+      },
+      {
+        "request": {
+          "method": "get",
+          "path": "/api/helloworld/example",
+          "body": {},
+          "query": {},
+          "params": {},
+          "matchType": "exact"
+        },
+        "response": {
+          "data": {
+            "key": "Hello World!"
+          },
+          "headers": {},
+          "waitTime": 0,
+          "statusCode": 200
+        }
+      }
+    ];
+
+
+    expect(result).toEqual(expected);
   });
 });
